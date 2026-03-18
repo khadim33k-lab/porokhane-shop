@@ -18,14 +18,14 @@ export default function ProductDetail() {
   const [qty, setQty]         = useState(1)
   const [selColor, setSelColor] = useState('')
   const [added, setAdded]     = useState(false)
+  const [activeImg, setActiveImg] = useState(0) // index de l'image affichée
 
   useEffect(() => {
     window.scrollTo({ top:0, behavior:'smooth' })
-    // Chercher dans Supabase
+    setActiveImg(0)
     supabase.from('products').select('*').eq('id', id).single()
       .then(({ data, error }) => {
         if (error || !data) {
-          // Fallback demo
           const demo = DEMO.find(p => p.id === id)
           if (!demo) { navigate('/produits'); return }
           setProduct(demo)
@@ -47,6 +47,16 @@ export default function ProductDetail() {
   const fmt      = n => Number(n).toLocaleString('fr-SN') + ' FCFA'
   const colors   = product?.colors?.split('·').map(c=>c.trim()).filter(Boolean) || []
   const discount = product?.old_price > 0 ? Math.round((1-product.price/product.old_price)*100) : 0
+
+  // Récupérer la liste de toutes les images
+  const getImages = () => {
+    if (!product) return []
+    if (product.images?.length > 0) return product.images
+    if (product.image_url) return [product.image_url]
+    return []
+  }
+
+  const images = getImages()
 
   const handleAddToCart = () => {
     addToCart(product, qty, selColor)
@@ -72,15 +82,49 @@ export default function ProductDetail() {
         <span>{product.name}</span>
       </div>
       <div className={`container ${styles.productSection}`}>
+
+        {/* BLOC IMAGES */}
         <div className={styles.imageBlock}>
-          <div className={styles.mainImage} style={{background:product.bg_color||'#FFF6E8'}}>
-            {product.image_url
-              ? <img src={product.image_url} alt={product.name} className={styles.productImage} />
-              : <span className={styles.productEmoji}>{product.emoji||'🧕'}</span>
+          {/* Image principale */}
+          <div className={styles.mainImage} style={{background: product.bg_color || '#FFF6E8'}}>
+            {images.length > 0
+              ? <img src={images[activeImg]} alt={product.name} className={styles.productImage} />
+              : <span className={styles.productEmoji}>{product.emoji || '🧕'}</span>
             }
-            {discount>0 && <span className={styles.discountBadge}>-{discount}%</span>}
+            {discount > 0 && <span className={styles.discountBadge}>-{discount}%</span>}
+
+            {/* Flèches navigation si plusieurs images */}
+            {images.length > 1 && (
+              <>
+                <button
+                  className={`${styles.imgNav} ${styles.imgNavLeft}`}
+                  onClick={() => setActiveImg(i => (i - 1 + images.length) % images.length)}
+                >‹</button>
+                <button
+                  className={`${styles.imgNav} ${styles.imgNavRight}`}
+                  onClick={() => setActiveImg(i => (i + 1) % images.length)}
+                >›</button>
+              </>
+            )}
           </div>
+
+          {/* Thumbnails */}
+          {images.length > 1 && (
+            <div className={styles.thumbnails}>
+              {images.map((url, idx) => (
+                <button
+                  key={idx}
+                  className={`${styles.thumbnail} ${activeImg === idx ? styles.thumbnailActive : ''}`}
+                  onClick={() => setActiveImg(idx)}
+                >
+                  <img src={url} alt={`vue ${idx + 1}`} />
+                </button>
+              ))}
+            </div>
+          )}
         </div>
+
+        {/* BLOC INFOS */}
         <div className={styles.infoBlock}>
           <div className={styles.productHeader}>
             <span className={styles.category}>{product.category}</span>
@@ -96,7 +140,7 @@ export default function ProductDetail() {
             </>}
           </div>
           {product.description && <p className={styles.description}>{product.description}</p>}
-          {colors.length>0 && (
+          {colors.length > 0 && (
             <div className={styles.colorsBlock}>
               <p className={styles.colorsLabel}>Coloris disponibles :</p>
               <div className={styles.colorsList}>

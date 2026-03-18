@@ -1,66 +1,68 @@
 .breadcrumb {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 14px 24px;
-  font-size: 12px;
-  color: var(--gray-mid);
-  flex-wrap: wrap;
+  display: flex; align-items: center; gap: 8px;
+  padding: 14px 24px; font-size: 12px; color: var(--gray-mid); flex-wrap: wrap;
 }
 .breadcrumb a { color: var(--gray-mid); text-decoration: none; transition: color .15s; }
 .breadcrumb a:hover { color: var(--orange); }
 .breadcrumb span:last-child { color: var(--black); font-weight: 500; }
 
 .productSection {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 48px;
-  padding-top: 24px;
-  padding-bottom: 56px;
-  align-items: start;
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 48px; padding-top: 24px; padding-bottom: 56px; align-items: start;
 }
 
-/* IMAGE */
-.imageBlock {}
+/* ─── GALERIE ─── */
+.imageBlock { display: flex; flex-direction: column; gap: 12px; }
+
 .mainImage {
-  border-radius: var(--radius-lg);
-  overflow: hidden;
+  border-radius: var(--radius-lg); overflow: hidden;
   aspect-ratio: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: flex; align-items: center; justify-content: center;
   position: relative;
 }
 .productImage { width: 100%; height: 100%; object-fit: cover; }
 .productEmoji { font-size: 140px; line-height: 1; }
+
 .discountBadge {
-  position: absolute;
-  top: 16px;
-  left: 16px;
-  background: var(--danger);
-  color: var(--white);
-  font-size: 13px;
-  font-weight: 700;
-  padding: 6px 12px;
-  border-radius: 4px;
+  position: absolute; top: 16px; left: 16px;
+  background: var(--danger); color: var(--white);
+  font-size: 13px; font-weight: 700;
+  padding: 6px 12px; border-radius: 4px;
 }
 
-/* INFOS */
+/* Flèches navigation */
+.imgNav {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  background: rgba(0,0,0,.45); color: white;
+  border: none; border-radius: 50%;
+  width: 36px; height: 36px; font-size: 22px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: background .2s; z-index: 2;
+}
+.imgNav:hover { background: rgba(0,0,0,.75); }
+.imgNavLeft  { left: 10px; }
+.imgNavRight { right: 10px; }
+
+/* Thumbnails */
+.thumbnails {
+  display: flex; gap: 8px; flex-wrap: wrap;
+}
+.thumbnail {
+  width: 72px; height: 72px;
+  border-radius: 6px; overflow: hidden;
+  border: 2px solid var(--border);
+  cursor: pointer; padding: 0;
+  transition: border-color .2s; flex-shrink: 0;
+  background: none;
+}
+.thumbnail img { width: 100%; height: 100%; object-fit: cover; }
+.thumbnailActive { border-color: var(--orange); }
+.thumbnail:hover { border-color: var(--orange); }
+
+/* ─── INFOS ─── */
 .productHeader { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-.category {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--orange);
-}
-.productName {
-  font-family: var(--font-serif);
-  font-size: 36px;
-  font-weight: 700;
-  line-height: 1.2;
-  margin-bottom: 8px;
-}
+.category { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--orange); }
+.productName { font-family: var(--font-serif); font-size: 36px; font-weight: 700; line-height: 1.2; margin-bottom: 8px; }
 .productMaterial { font-size: 13px; color: var(--gray-mid); font-style: italic; margin-bottom: 20px; }
 
 .priceBlock { display: flex; align-items: baseline; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
@@ -75,15 +77,9 @@
 .colorsLabel { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--gray-mid); margin-bottom: 10px; }
 .colorsList { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
 .colorBtn {
-  padding: 7px 14px;
-  border: 1.5px solid var(--border);
-  border-radius: 20px;
-  font-size: 12px;
-  cursor: pointer;
-  background: var(--white);
-  font-family: var(--font-sans);
-  transition: all .2s;
-  color: var(--black);
+  padding: 7px 14px; border: 1.5px solid var(--border); border-radius: 20px;
+  font-size: 12px; cursor: pointer; background: var(--white);
+  font-family: var(--font-sans); transition: all .2s; color: var(--black);
 }
 .colorBtn:hover { border-color: var(--orange); }
 .colorSelected { border-color: var(--orange); background: var(--orange-light); font-weight: 600; }
@@ -94,15 +90,10 @@
 .qtyLabel { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--gray-mid); }
 .qtyCtrl { display: flex; align-items: center; gap: 10px; }
 .qtyBtn {
-  width: 32px; height: 32px;
-  border: 1.5px solid var(--border);
-  background: var(--white);
-  border-radius: 4px;
-  font-size: 18px;
-  cursor: pointer;
+  width: 32px; height: 32px; border: 1.5px solid var(--border); background: var(--white);
+  border-radius: 4px; font-size: 18px; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
-  transition: all .15s;
-  font-family: var(--font-sans);
+  transition: all .15s; font-family: var(--font-sans);
 }
 .qtyBtn:hover { background: var(--orange); border-color: var(--orange); }
 .qtyVal { font-size: 16px; font-weight: 700; min-width: 32px; text-align: center; }
@@ -117,12 +108,8 @@
 
 /* LIVRAISON */
 .deliveryInfo {
-  background: var(--gray-light);
-  border-radius: var(--radius-lg);
-  padding: 18px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
+  background: var(--gray-light); border-radius: var(--radius-lg);
+  padding: 18px; display: flex; flex-direction: column; gap: 14px;
 }
 .deliveryItem { display: flex; gap: 12px; align-items: flex-start; font-size: 12px; }
 .deliveryItem span { font-size: 20px; flex-shrink: 0; }
@@ -133,13 +120,9 @@
 .related { padding: 48px 0; border-top: 1px solid var(--border); }
 .relatedTitle { font-family: var(--font-serif); font-size: 28px; font-weight: 700; margin-bottom: 24px; }
 .relatedGrid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1px;
-  background: var(--border);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 1px; background: var(--border);
+  border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden;
 }
 
 @media (max-width: 900px) {
@@ -149,4 +132,5 @@
 @media (max-width: 480px) {
   .productName { font-size: 26px; }
   .relatedGrid { grid-template-columns: 1fr; }
+  .thumbnail { width: 56px; height: 56px; }
 }
