@@ -1,0 +1,22 @@
+/* Checkout.module.css */
+.checkoutPage { padding: 32px 0 56px; }
+.pageTitle { font-family: var(--font-serif); font-size: 32px; font-weight: 700; margin-bottom: 28px; }
+.checkoutGrid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 28px; align-items: start; }
+.form {}
+.summary { position: sticky; top: 80px; }
+.summaryItem { display: flex; gap: 12px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); }
+.summaryEmoji { width: 50px; height: 60px; background: var(--gray-light); display: flex; align-items: center; justify-content: center; font-size: 24px; border-radius: 4px; flex-shrink: 0; }
+.summaryInfo { flex: 1; }
+.summaryName { font-family: var(--font-serif); font-size: 14px; margin-bottom: 2px; }
+.summaryMeta { font-size: 11px; color: var(--gray-mid); }
+.summaryPrice { font-size: 13px; font-weight: 600; color: var(--orange); flex-shrink: 0; }
+.summaryTotal { display: flex; justify-content: space-between; font-size: 13px; color: var(--gray-mid); margin-top: 12px; }
+.summaryGrand { font-size: 18px; font-weight: 700; color: var(--black); font-family: var(--font-serif); margin-top: 8px; }
+.successPage { min-height: 80vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+.successCard { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 40px; max-width: 480px; text-align: center; }
+.successIcon { font-size: 56px; margin-bottom: 16px; }
+.successCard h1 { font-family: var(--font-serif); font-size: 28px; margin-bottom: 8px; }
+.successCard p { font-size: 14px; color: var(--gray-mid); line-height: 1.7; }
+.successId { font-size: 18px; font-weight: 700; color: var(--orange); margin-bottom: 12px; }
+.emptyPage { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh; gap: 16px; color: var(--gray-mid); }
+@media (max-width: 768px) { .checkoutGrid { grid-template-columns: 1fr; } .summary { position: static; } }
