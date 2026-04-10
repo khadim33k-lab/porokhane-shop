@@ -65,7 +65,7 @@ export default function ProductDetail() {
   }
 
   const handleWhatsApp = () => {
-    const msg = `Bonjour Porokhane Shop ✨ !\n\nJe suis intéressée par :\n• ${product.name}\n• Coloris : ${selColor||'à préciser'}\n• Quantité : ${qty}\n• Prix : ${fmt(product.price)}\n\nMerci !`
+    const msg = `Bonjour Porokhane Shop ✨ !\n\nJe suis intéressée par :\n• ${product.name}\n• Couleur : ${selColor||'à préciser'}\n• Quantité : ${qty}\n• Prix : ${fmt(product.price)}\n\nMerci !`
     window.open(`https://wa.me/221785363425?text=${encodeURIComponent(msg)}`, '_blank')
   }
 
