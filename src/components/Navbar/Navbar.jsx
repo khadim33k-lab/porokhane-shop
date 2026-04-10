@@ -4,6 +4,8 @@ import { useCart } from '../../context/CartContext'
 import CartDrawer from '../Cart/CartDrawer'
 import styles from './Navbar.module.css'
 
+const LOGO_URL = 'https://fedznkkxobzgzsbybozb.supabase.co/storage/v1/object/public/product-images/Porokhane%20SHOP.png'
+
 function Navbar() {
   const { totalItems } = useCart()
   const [cartOpen, setCartOpen] = useState(false)
@@ -15,7 +17,13 @@ function Navbar() {
       <nav className={styles.navbar}>
         {/* LOGO */}
         <Link to="/" className={styles.logo}>
-          <div className={styles.logoIcon}>🛍️</div>
+          <img
+            src={LOGO_URL}
+            alt="Porokhane Shop"
+            className={styles.logoImg}
+            onError={e => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex' }}
+          />
+          <div className={styles.logoIconFallback}>🛍️</div>
           <div>
             <div className={styles.logoName}>Porokhane</div>
             <div className={styles.logoSub}>Shop ✨</div>
@@ -38,9 +46,7 @@ function Navbar() {
             target="_blank" rel="noopener noreferrer"
             className={styles.waBtn}
             title="Commander sur WhatsApp"
-          >
-            💬
-          </a>
+          >💬</a>
           <button
             className={styles.cartBtn}
             onClick={() => setCartOpen(true)}
