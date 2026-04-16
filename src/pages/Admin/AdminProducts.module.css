@@ -48,7 +48,71 @@
   position: sticky; bottom: 0; background: var(--white);
 }
 
-/* IMAGE UPLOAD */
+/* IMAGES MULTIPLES */
+.imagesGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.imageThumb {
+  width: 90px; height: 90px;
+  position: relative;
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 2px solid var(--border);
+  flex-shrink: 0;
+}
+.imageThumb img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
+.mainBadge {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  background: var(--orange);
+  color: var(--black);
+  font-size: 9px;
+  font-weight: 700;
+  text-align: center;
+  padding: 2px 0;
+  letter-spacing: .5px;
+}
+.removeImgBtn {
+  position: absolute;
+  top: 3px; right: 3px;
+  width: 20px; height: 20px;
+  background: rgba(0,0,0,.65);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  font-size: 10px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  line-height: 1;
+}
+.removeImgBtn:hover { background: var(--danger); }
+
+.addImgBtn {
+  width: 90px; height: 90px;
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 4px; cursor: pointer;
+  font-size: 24px;
+  color: var(--gray-mid);
+  transition: all .2s;
+  flex-shrink: 0;
+}
+.addImgBtn:hover {
+  border-color: var(--orange);
+  color: var(--orange);
+  background: var(--gray-light);
+}
+
+/* IMAGE UPLOAD (legacy) */
 .imageUpload { display: flex; align-items: center; gap: 14px; }
 .imagePreview { width: 80px; height: 80px; object-fit: cover; border-radius: var(--radius); border: 1px solid var(--border); }
 .imagePlaceholder {
@@ -57,4 +121,3 @@
   display: flex; align-items: center; justify-content: center;
   font-size: 36px; border: 1px solid var(--border); flex-shrink: 0;
 }
-.uploadBtn { cursor: pointer; }
