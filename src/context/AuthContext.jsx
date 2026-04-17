@@ -4,37 +4,70 @@ import { supabase } from '../supabase/client'
 const AuthContext = createContext()
 
 export function AuthProvider({ children }) {
-  const [user, setUser]     = useState(null)
+  const [user, setUser]       = useState(null)
+  const [isAdmin, setIsAdmin] = useState(false)  // ✅ Fix #1 : false par défaut
   const [loading, setLoading] = useState(true)
 
+  // Vérifier si l'utilisateur est dans la table admins
+  const checkAdmin = async (userId) => {
+    if (!userId) { setIsAdmin(false); return }
+    try {
+      const { data, error } = await supabase
+        .from('admins')
+        .select('id')
+        .eq('user_id', userId)
+        .single()
+      setIsAdmin(!error && !!data)
+    } catch {
+      setIsAdmin(false)
+    }
+  }
+
   useEffect(() => {
-    // Vérifier la session au chargement
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    // Vérifier la session au démarrage
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       setUser(session?.user ?? null)
+      await checkAdmin(session?.user?.id)
       setLoading(false)
     }).catch(() => setLoading(false))
 
     // Écouter les changements de session
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null)
-    })
-
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (_event, session) => {
+        setUser(session?.user ?? null)
+        await checkAdmin(session?.user?.id)
+      }
+    )
     return () => subscription.unsubscribe()
   }, [])
 
   const login = async (email, password) => {
     const { data, error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) throw error
+    // Vérifier que c'est bien un admin
+    const { data: adminData } = await supabase
+      .from('admins')
+      .select('id')
+      .eq('user_id', data.user.id)
+      .single()
+
+    if (!adminData) {
+      // Connecté mais pas admin → déconnecter
+      await supabase.auth.signOut()
+      throw new Error('Accès refusé. Compte non autorisé.')
+    }
+    setIsAdmin(true)
     return data
   }
 
   const logout = async () => {
     await supabase.auth.signOut()
     setUser(null)
+    setIsAdmin(false)
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, isAdmin: !!user }}>
+    <AuthContext.Provider value={{ user, isAdmin, loading, login, logout }}>
       {!loading && children}
     </AuthContext.Provider>
   )
