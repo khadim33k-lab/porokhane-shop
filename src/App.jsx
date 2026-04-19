@@ -1,8 +1,7 @@
 import React from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { CartProvider }  from './context/CartContext'
-import { AuthProvider }  from './context/AuthContext'
-import { useAuth }       from './context/AuthContext'
+import { AuthProvider, useAuth } from './context/AuthContext'
 
 import Home           from './pages/Home'
 import Products       from './pages/Products'
@@ -19,16 +18,18 @@ import AdminStock     from './pages/Admin/AdminStock'
 import AdminSales     from './pages/Admin/AdminSales'
 import AdminSettings  from './pages/Admin/AdminSettings'
 
+// ✅ Fix #1 : vérifie user ET isAdmin
 function ProtectedRoute({ children }) {
-  const { user, loading } = useAuth()
+  const { user, isAdmin, loading } = useAuth()
   if (loading) return <div className="spinner" style={{ marginTop: 80 }} />
-  if (!user)   return <Navigate to="/login" replace />
+  if (!user || !isAdmin) return <Navigate to="/login" replace />
   return children
 }
 
 function AppRoutes() {
   return (
     <Routes>
+      {/* ─── PUBLIC ─── */}
       <Route path="/"             element={<Home />} />
       <Route path="/produits"     element={<Products />} />
       <Route path="/produits/:id" element={<ProductDetail />} />
@@ -36,7 +37,10 @@ function AppRoutes() {
       <Route path="/commande"     element={<Checkout />} />
       <Route path="/login"        element={<Login />} />
 
-      <Route path="/admin" element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
+      {/* ─── ADMIN PROTÉGÉ ─── */}
+      <Route path="/admin" element={
+        <ProtectedRoute><AdminLayout /></ProtectedRoute>
+      }>
         <Route index          element={<Dashboard />} />
         <Route path="produits"   element={<AdminProducts />} />
         <Route path="commandes"  element={<AdminOrders />} />

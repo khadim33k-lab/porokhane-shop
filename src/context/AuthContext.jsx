@@ -5,7 +5,7 @@ const AuthContext = createContext()
 
 export function AuthProvider({ children }) {
   const [user, setUser]       = useState(null)
-  const [isAdmin, setIsAdmin] = useState(false)  // ✅ Fix #1 : false par défaut
+  const [isAdmin, setIsAdmin] = useState(false)
   const [loading, setLoading] = useState(true)
 
   // Vérifier si l'utilisateur est dans la table admins
@@ -44,6 +44,7 @@ export function AuthProvider({ children }) {
   const login = async (email, password) => {
     const { data, error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) throw error
+
     // Vérifier que c'est bien un admin
     const { data: adminData } = await supabase
       .from('admins')
@@ -52,10 +53,10 @@ export function AuthProvider({ children }) {
       .single()
 
     if (!adminData) {
-      // Connecté mais pas admin → déconnecter
       await supabase.auth.signOut()
       throw new Error('Accès refusé. Compte non autorisé.')
     }
+
     setIsAdmin(true)
     return data
   }

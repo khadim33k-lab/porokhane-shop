@@ -2,26 +2,28 @@ import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../supabase/client'
 import { useCart } from '../context/CartContext'
-import Navbar  from '../components/Navbar/Navbar'
-import Footer  from '../components/Footer'
-import styles  from './Checkout.module.css'
+import { whatsappLink, SHOP_CONFIG } from '../lib/shopConfig'
+import Navbar from '../components/Navbar/Navbar'
+import Footer from '../components/Footer'
+import styles from './Checkout.module.css'
 
 export default function Checkout() {
   const { cartItems, totalPrice, clearCart } = useCart()
   const navigate = useNavigate()
-  const [loading, setLoading] = useState(false)
-  const [success, setSuccess] = useState(false)
-  const [orderId, setOrderId] = useState('')
-  const [serverError, setServerError] = useState('') // ✅ Fix #2 : afficher les vraies erreurs
+  const [loading, setLoading]       = useState(false)
+  const [success, setSuccess]       = useState(false)
+  const [orderId, setOrderId]       = useState('')
+  const [serverError, setServerError] = useState('')
   const [form, setForm] = useState({
-    firstName:'', lastName:'', phone:'', zone:'', address:'', paymentMethod:'Wave', note:''
+    firstName:'', lastName:'', phone:'',
+    zone:'', address:'', paymentMethod:'Wave', note:''
   })
   const [errors, setErrors] = useState({})
 
   const fmt = n => Number(n || 0).toLocaleString('fr-SN') + ' FCFA'
   const set  = e => {
     setForm({...form, [e.target.name]: e.target.value})
-    setErrors({...errors, [e.target.name]:''})
+    setErrors({...errors, [e.target.name]: ''})
     setServerError('')
   }
 
@@ -43,79 +45,50 @@ export default function Checkout() {
     setServerError('')
 
     try {
-      // ✅ Fix #2 : créer la commande en base AVANT de vider le panier
-      const { data: orderData, error: orderError } = await supabase
-        .from('orders')
-        .insert({
-          client_name:    `${form.firstName} ${form.lastName}`,
-          client_phone:   form.phone,
-          client_zone:    form.zone,
-          client_address: form.address,
-          items: cartItems.map(i => ({
-            product_id: i.id,
-            name:       i.name,
-            price:      i.price,
-            quantity:   i.quantity,
-            color:      i.color || '',
-            emoji:      i.emoji || '🧕'
-          })),
-          total:          totalPrice,
-          payment_method: form.paymentMethod,
-          note:           form.note,
-          status:         'Nouveau'
-        })
-        .select()
-        .single()
+      // ✅ Fix #5 : fonction SQL transactionnelle
+      // commande + décrémentation stock en une seule opération atomique
+      const { data, error } = await supabase.rpc('create_order_with_stock', {
+        p_client_name:    `${form.firstName} ${form.lastName}`,
+        p_client_phone:   form.phone,
+        p_client_zone:    form.zone,
+        p_client_address: form.address,
+        p_items: cartItems.map(i => ({
+          product_id: i.id,
+          name:       i.name,
+          price:      i.price,
+          quantity:   i.quantity,
+          color:      i.color || '',
+          emoji:      i.emoji || '🧕'
+        })),
+        p_total:          totalPrice,
+        p_payment_method: form.paymentMethod,
+        p_note:           form.note
+      })
 
-      // ✅ Fix #2 : si erreur → NE PAS valider la commande
-      if (orderError) {
-        console.error('Erreur création commande:', orderError)
-        setServerError(
-          'Une erreur est survenue lors de l\'enregistrement de votre commande. ' +
-          'Veuillez réessayer ou nous contacter sur WhatsApp.'
-        )
+      if (error) {
+        // Erreur métier (stock insuffisant, etc.)
+        const msg = error.message?.includes('Stock insuffisant')
+          ? error.message
+          : 'Erreur lors de l\'enregistrement. Veuillez réessayer.'
+        setServerError(msg)
         return
       }
 
-      // ✅ Fix #3 : décrémenter le stock (avec gestion d'erreur silencieuse)
-      for (const item of cartItems) {
-        try {
-          const { data: prod } = await supabase
-            .from('products')
-            .select('stock, sales_count')
-            .eq('id', item.id)
-            .single()
-
-          if (prod) {
-            await supabase.from('products').update({
-              stock:       Math.max(0, prod.stock - item.quantity),
-              sales_count: (prod.sales_count || 0) + item.quantity,
-              updated_at:  new Date().toISOString()
-            }).eq('id', item.id)
-          }
-        } catch (stockErr) {
-          // Log l'erreur mais ne bloque pas la commande
-          console.warn('Stock non décrémenté pour', item.id, stockErr)
-        }
-      }
-
-      // ✅ Fix #2 : seulement MAINTENANT on vide le panier et on confirme
-      const shortId = orderData.id.slice(-6).toUpperCase()
+      // ✅ Seulement si tout s'est bien passé en base
+      const shortId = data.order_id.toString().slice(-6).toUpperCase()
       clearCart()
       setOrderId(shortId)
       setSuccess(true)
 
     } catch (err) {
-      console.error('Erreur inattendue:', err)
-      setServerError(
-        'Erreur inattendue. Veuillez réessayer ou commander directement via WhatsApp.'
-      )
+      console.error(err)
+      setServerError('Erreur inattendue. Commandez directement sur WhatsApp.')
     } finally {
       setLoading(false)
     }
   }
 
-  // ─── PAGE SUCCÈS ───
+  // ─── SUCCÈS ───
   if (success) return (
     <>
       <Navbar />
@@ -126,12 +99,10 @@ export default function Checkout() {
           <p className={styles.successId}>Réf : CMD-{orderId}</p>
           <p>
             Merci {form.firstName} ! Votre commande a bien été enregistrée.
-            Nous vous contacterons au <strong>{form.phone}</strong> pour confirmer la livraison.
+            Nous vous contacterons au <strong>{form.phone}</strong> sous peu.
           </p>
           <a
-            href={`https://wa.me/221785363425?text=${encodeURIComponent(
-              `Bonjour ! J'ai passé une commande (CMD-${orderId}). Merci !`
-            )}`}
+            href={whatsappLink(`Bonjour ! J'ai passé une commande (CMD-${orderId}). Merci !`)}
             target="_blank" rel="noopener noreferrer"
             className="btn btn-success btn-lg"
             style={{ marginTop: 20 }}
@@ -152,7 +123,9 @@ export default function Checkout() {
       <Navbar />
       <div className={styles.emptyPage}>
         <p>Votre panier est vide</p>
-        <button className="btn btn-primary" onClick={() => navigate('/')}>Voir la boutique</button>
+        <button className="btn btn-primary" onClick={() => navigate('/')}>
+          Voir la boutique
+        </button>
       </div>
       <Footer />
     </>
@@ -164,16 +137,13 @@ export default function Checkout() {
       <div className={`container ${styles.checkoutPage}`}>
         <h1 className={styles.pageTitle}>Finaliser ma commande</h1>
 
-        {/* ✅ Fix #2 : afficher les vraies erreurs serveur */}
         {serverError && (
           <div className="alert alert-danger" style={{ marginBottom: 20 }}>
             ❌ {serverError}
             <a
-              href={`https://wa.me/221785363425?text=${encodeURIComponent(
-                `Bonjour ! J'ai un problème avec ma commande sur votre site. Pouvez-vous m'aider ?`
-              )}`}
+              href={whatsappLink('Bonjour ! Je voudrais passer une commande.')}
               target="_blank" rel="noopener noreferrer"
-              style={{ display: 'block', marginTop: 8, fontWeight: 700, color: 'inherit' }}
+              style={{ display:'block', marginTop:8, fontWeight:700 }}
             >
               💬 Commander directement sur WhatsApp →
             </a>
@@ -226,7 +196,7 @@ export default function Checkout() {
                   </select>
                 </div>
                 <div className="form-group">
-                  <label className="form-label">Note (couleur, instructions...)</label>
+                  <label className="form-label">Note (instructions livraison...)</label>
                   <textarea className="form-textarea" name="note" value={form.note} onChange={set}
                     placeholder="Ex: livraison après 17h..." rows={3} />
                 </div>
@@ -234,7 +204,7 @@ export default function Checkout() {
             </div>
 
             <button type="submit" className="btn btn-primary btn-lg btn-full" disabled={loading}>
-              {loading ? '⏳ Enregistrement en cours...' : `✅ Confirmer ma commande — ${fmt(totalPrice)}`}
+              {loading ? '⏳ Enregistrement...' : `✅ Confirmer — ${fmt(totalPrice)}`}
             </button>
           </form>
 
@@ -250,9 +220,7 @@ export default function Checkout() {
                     <div className={styles.summaryEmoji}>{i.emoji || '🧕'}</div>
                     <div className={styles.summaryInfo}>
                       <p className={styles.summaryName}>{i.name}</p>
-                      <p className={styles.summaryMeta}>
-                        {i.color && `${i.color} · `}Qté: {i.quantity}
-                      </p>
+                      <p className={styles.summaryMeta}>{i.color && `${i.color} · `}Qté: {i.quantity}</p>
                     </div>
                     <p className={styles.summaryPrice}>{fmt(i.price * i.quantity)}</p>
                   </div>
