@@ -66,7 +66,7 @@ function Footer() {
 
       <div className={styles.bottom}>
         <span>© 2026 Porokhane Shop ✨ · Tous droits réservés</span>
-        <span>Fait avec ❤️ au Sénégal 🇸🇳</span>
+        <span>Bichri Groupe</span>
       </div>
     </footer>
   )
