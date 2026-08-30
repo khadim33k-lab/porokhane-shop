@@ -3,13 +3,13 @@
 
 export const SHOP_CONFIG = {
     name:      'Porokhane Shop',
-    slogan:    'Élégance, Pudeur et Classe en parfait symbiose !',
+    slogan:    'Élégance, Pudeur et Classe en parfaite symbiose',
     phone:     '78 536 34 25',
     whatsapp:  '221785363425',
     address:   'Guediawaye, Hamo4, Dakar',
     twitter:   '@porokhaneshop',
     zones:     'Dakar, Pikine, Guediawaye, Parcelles, Thiaroye',
-    logo:      'https://fedznkkxobzgzsbybozb.supabase.co/storage/v1/object/public/product-images/Porokhane%20SHOP.png',
+    logo:      '/images/porokhane-logo.webp',
     instagram: '',
     email:     'admin@porokhaneshop.com',
   }

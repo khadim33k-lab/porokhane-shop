@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { supabase } from '../../supabase/client'
+import { SHOP_CONFIG } from '../../lib/shopConfig'
 import styles from './AdminProducts.module.css'
 
 const CATS   = ['Pashmina', 'Jersey', 'Cashmere', 'Crêpe & Soie', 'Chiffon', 'Viscose', 'Accessoires']
 const MATS   = ['Pashmina', 'Jersey', 'Cashmere', 'Crêpe', 'Soie', 'Chiffon', 'Viscose', 'Coton', '—']
 const BADGES = ['', 'Nouveau', 'Promo', 'Exclusif', 'Premium', 'Luxe']
-const EMOJIS = ['🧕', '🌸', '🌺', '🌙', '🌟', '✨', '💜', '👑', '🍂', '📿', '🎀', '💚', '🌿', '👜']
-
 const emptyForm = {
   name: '', category: 'Pashmina', material: 'Pashmina',
   price: '', old_price: '', stock: '', alert_stock: '3',
@@ -178,7 +177,7 @@ export default function AdminProducts() {
   return (
     <div className={styles.page}>
       <div className={styles.pageHeader}>
-        <h1 className={styles.pageTitle}>Catalogue Produits</h1>
+        <h1 className={styles.pageTitle}>Catalogue produits</h1>
         <button className="btn btn-primary" onClick={openAdd}>+ Ajouter un produit</button>
       </div>
 
@@ -187,7 +186,7 @@ export default function AdminProducts() {
         <input
           className="form-input"
           style={{ maxWidth: 260 }}
-          placeholder="🔍 Rechercher..."
+          placeholder="Rechercher un produit…"
           value={search}
           onChange={e => setSearch(e.target.value)}
         />
@@ -223,7 +222,7 @@ export default function AdminProducts() {
                           {imgs.length > 0 ? imgs.slice(0, 3).map((img, i) => (
                             <img key={i} src={img} alt="" style={{ width: 36, height: 36, objectFit: 'cover', borderRadius: 4, border: '1px solid var(--border)' }} />
                           )) : (
-                            <span style={{ fontSize: 28 }}>{p.emoji}</span>
+                            <img src={SHOP_CONFIG.logo} alt="" style={{ width: 36, height: 36, objectFit: 'contain', border: '1px solid var(--border)', opacity:.72 }} />
                           )}
                           {imgs.length > 3 && (
                             <div style={{ width: 36, height: 36, background: 'var(--bg)', borderRadius: 4, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, color: 'var(--gray-mid)' }}>
@@ -337,7 +336,7 @@ export default function AdminProducts() {
                 {/* Bouton ajouter images */}
                 {(existingImages.length + imageFiles.length) < 6 && (
                   <label className="btn btn-outline btn-sm" style={{ cursor: 'pointer', display: 'inline-block' }}>
-                    📸 Ajouter des photos
+                    Ajouter des photos
                     <input
                       ref={fileInputRef}
                       type="file"
@@ -406,32 +405,18 @@ export default function AdminProducts() {
                 <textarea className="form-textarea" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} rows={3} placeholder="Décrivez ce voile..." />
               </div>
 
-              <div className="form-grid">
-                <div className="form-group">
-                  <label className="form-label">Badge</label>
-                  <select className="form-select" value={form.badge} onChange={e => setForm({ ...form, badge: e.target.value })}>
-                    {BADGES.map(b => <option key={b} value={b}>{b || '— Aucun —'}</option>)}
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Emoji (si pas de photo)</label>
-                  <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 4 }}>
-                    {EMOJIS.map(e => (
-                      <span
-                        key={e}
-                        onClick={() => setForm({ ...form, emoji: e })}
-                        style={{ fontSize: 22, cursor: 'pointer', padding: 4, borderRadius: 4, border: form.emoji === e ? '2px solid var(--orange)' : '2px solid transparent' }}
-                      >{e}</span>
-                    ))}
-                  </div>
-                </div>
+              <div className="form-group">
+                <label className="form-label">Badge</label>
+                <select className="form-select" value={form.badge} onChange={e => setForm({ ...form, badge: e.target.value })}>
+                  {BADGES.map(b => <option key={b} value={b}>{b || '— Aucun —'}</option>)}
+                </select>
               </div>
             </div>
 
             <div className={styles.modalFooter}>
               <button className="btn btn-outline" onClick={() => setShowModal(false)}>Annuler</button>
               <button className="btn btn-primary" onClick={handleSave} disabled={saving}>
-                {uploading ? '📸 Upload images...' : saving ? 'Sauvegarde...' : editingId ? 'Enregistrer' : 'Créer le produit'}
+                {uploading ? 'Importation des images…' : saving ? 'Sauvegarde…' : editingId ? 'Enregistrer' : 'Créer le produit'}
               </button>
             </div>
           </div>

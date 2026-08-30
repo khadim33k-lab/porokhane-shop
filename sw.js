@@ -1,7 +1,7 @@
 // Service Worker — Porokhane Shop
 // Cache les ressources pour un chargement instantané
 
-const CACHE_NAME = 'porokhane-v1'
+const CACHE_NAME = 'porokhane-v2'
 
 const STATIC_ASSETS = [
   '/',

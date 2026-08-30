@@ -3,8 +3,11 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '../supabase/client'
 import { useCart } from '../context/CartContext'
 import { whatsappLink, SHOP_CONFIG } from '../lib/shopConfig'
+import { getProductImage } from '../lib/productImages'
 import Navbar from '../components/Navbar/Navbar'
 import Footer from '../components/Footer'
+import WhatsAppIcon from '../components/icons/WhatsAppIcon'
+import { CashIcon, ShieldIcon } from '../components/icons/StoreIcons'
 import styles from './Checkout.module.css'
 
 export default function Checkout() {
@@ -16,7 +19,7 @@ export default function Checkout() {
   const [serverError, setServerError] = useState('')
   const [form, setForm] = useState({
     firstName:'', lastName:'', phone:'',
-    zone:'', address:'', paymentMethod:'Wave', note:''
+    zone:'', address:'', paymentMethod:'Espèces à la livraison', note:''
   })
   const [errors, setErrors] = useState({})
 
@@ -107,7 +110,7 @@ export default function Checkout() {
             className="btn btn-success btn-lg"
             style={{ marginTop: 20 }}
           >
-            💬 Confirmer sur WhatsApp
+            <WhatsAppIcon size={20} /> Confirmer sur WhatsApp
           </a>
           <button className="btn btn-outline" onClick={() => navigate('/')} style={{ marginTop: 10 }}>
             Retour à la boutique
@@ -135,7 +138,15 @@ export default function Checkout() {
     <>
       <Navbar />
       <div className={`container ${styles.checkoutPage}`}>
-        <h1 className={styles.pageTitle}>Finaliser ma commande</h1>
+        <header className={styles.checkoutHeader}>
+          <div>
+            <p className={styles.eyebrow}>Commande sécurisée</p>
+            <h1 className={styles.pageTitle}>Finaliser votre commande</h1>
+          </div>
+          <p className={styles.pageLead}>
+            Renseignez vos coordonnées. Notre équipe vous contactera pour confirmer la livraison.
+          </p>
+        </header>
 
         {serverError && (
           <div className="alert alert-danger" style={{ marginBottom: 20 }}>
@@ -145,16 +156,22 @@ export default function Checkout() {
               target="_blank" rel="noopener noreferrer"
               style={{ display:'block', marginTop:8, fontWeight:700 }}
             >
-              💬 Commander directement sur WhatsApp →
+              <WhatsAppIcon size={18} /> Commander directement sur WhatsApp →
             </a>
           </div>
         )}
 
         <div className={styles.checkoutGrid}>
-          <form onSubmit={handleSubmit}>
-            <div className="card" style={{ marginBottom: 20 }}>
-              <div className="card-header"><span className="card-title">Vos informations</span></div>
-              <div className="card-body">
+          <form onSubmit={handleSubmit} className={styles.formColumn}>
+            <section className={styles.sectionCard}>
+              <div className={styles.sectionHeader}>
+                <span className={styles.sectionNumber}>01</span>
+                <div>
+                  <h2>Informations de livraison</h2>
+                  <p>Les champs marqués d’un astérisque sont obligatoires.</p>
+                </div>
+              </div>
+              <div className={styles.sectionBody}>
                 <div className="form-grid">
                   <div className="form-group">
                     <label className="form-label">Prénom *</label>
@@ -182,49 +199,76 @@ export default function Checkout() {
                   <input className="form-input" name="address" value={form.address} onChange={set} placeholder="Rue, numéro, repère..." />
                 </div>
               </div>
-            </div>
+            </section>
 
-            <div className="card" style={{ marginBottom: 20 }}>
-              <div className="card-header"><span className="card-title">Paiement</span></div>
-              <div className="card-body">
-                <div className="form-group">
-                  <select className="form-select" name="paymentMethod" value={form.paymentMethod} onChange={set}>
-                    <option value="Wave">💙 Wave</option>
-                    <option value="Orange Money">🟠 Orange Money</option>
-                    <option value="Free Money">🟢 Free Money</option>
-                    <option value="Espèces">💵 Espèces à la livraison</option>
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Note (instructions livraison...)</label>
-                  <textarea className="form-textarea" name="note" value={form.note} onChange={set}
-                    placeholder="Ex: livraison après 17h..." rows={3} />
+            <section className={styles.sectionCard}>
+              <div className={styles.sectionHeader}>
+                <span className={styles.sectionNumber}>02</span>
+                <div>
+                  <h2>Paiement</h2>
+                  <p>Un mode simple, sans paiement en ligne.</p>
                 </div>
               </div>
-            </div>
+              <div className={styles.sectionBody}>
+                <div className={styles.paymentOnly}>
+                  <div className={styles.paymentIcon}><CashIcon size={25} /></div>
+                  <div className={styles.paymentText}>
+                    <strong>Paiement à la livraison</strong>
+                    <p>Vous réglez votre commande à sa réception.</p>
+                  </div>
+                  <span className={styles.paymentBadge}>Sélectionné</span>
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Instructions de livraison</label>
+                  <textarea className="form-textarea" name="note" value={form.note} onChange={set}
+                    placeholder="Exemple : livraison après 17 h, appeler à l’arrivée…" rows={3} />
+                </div>
+              </div>
+            </section>
 
-            <button type="submit" className="btn btn-primary btn-lg btn-full" disabled={loading}>
-              {loading ? '⏳ Enregistrement...' : `✅ Confirmer — ${fmt(totalPrice)}`}
+            <button type="submit" className={styles.submitBtn} disabled={loading}>
+              {loading ? 'Enregistrement de la commande…' : `Confirmer la commande — ${fmt(totalPrice)}`}
             </button>
+            <p className={styles.secureNote}><ShieldIcon size={17} /> Vos informations sont utilisées uniquement pour traiter votre commande.</p>
           </form>
 
           {/* RÉSUMÉ */}
           <div className={styles.summary}>
-            <div className="card">
-              <div className="card-header">
-                <span className="card-title">Résumé ({cartItems.length} article{cartItems.length > 1 ? 's' : ''})</span>
+            <div className={styles.summaryCard}>
+              <div className={styles.summaryHeader}>
+                <div>
+                  <span className={styles.summaryEyebrow}>Votre sélection</span>
+                  <h2>Récapitulatif</h2>
+                </div>
+                <span className={styles.summaryCount}>{cartItems.length}</span>
               </div>
-              <div className="card-body">
-                {cartItems.map(i => (
-                  <div key={i.key} className={styles.summaryItem}>
-                    <div className={styles.summaryEmoji}>{i.emoji || '🧕'}</div>
-                    <div className={styles.summaryInfo}>
-                      <p className={styles.summaryName}>{i.name}</p>
-                      <p className={styles.summaryMeta}>{i.color && `${i.color} · `}Qté: {i.quantity}</p>
+              <div className={styles.summaryBody}>
+                {cartItems.map(i => {
+                  const image = getProductImage(i)
+
+                  return (
+                    <div key={i.key} className={styles.summaryItem}>
+                      <div className={styles.summaryImage}>
+                        <img
+                          src={image || SHOP_CONFIG.logo}
+                          alt={image ? i.name : 'Porokhane Shop'}
+                          className={image ? styles.productImage : styles.fallbackLogo}
+                        />
+                      </div>
+                      <div className={styles.summaryInfo}>
+                        <p className={styles.summaryName}>{i.name}</p>
+                        <p className={styles.summaryMeta}>{i.color && `${i.color} · `}Qté: {i.quantity}</p>
+                      </div>
+                      <p className={styles.summaryPrice}>{fmt(i.price * i.quantity)}</p>
                     </div>
-                    <p className={styles.summaryPrice}>{fmt(i.price * i.quantity)}</p>
-                  </div>
-                ))}
+                  )
+                })}
+              </div>
+              <div className={styles.summaryFooter}>
+                <div className={styles.summaryTotal}>
+                  <span>Livraison</span>
+                  <span className={styles.deliveryPending}>À confirmer</span>
+                </div>
                 <div className={`${styles.summaryTotal} ${styles.summaryGrand}`}>
                   <span>Total</span>
                   <span>{fmt(totalPrice)}</span>

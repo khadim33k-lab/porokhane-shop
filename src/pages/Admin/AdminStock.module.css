@@ -1,9 +1,10 @@
-.page { padding: 24px; }
-.pageHeader { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
-.pageTitle { font-family: var(--font-serif); font-size: 28px; font-weight: 700; }
+.page { padding: 32px 36px 54px; }
+.pageHeader { display: flex; justify-content: space-between; align-items: flex-end; gap: 14px; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
+.pageTitle { font-family: var(--font-serif); font-size: 34px; font-weight: 500; line-height: 1.1; }
+.pageHeader :global(.btn) { display: inline-flex; align-items: center; gap: 7px; }
 
 .statsRow { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 20px; }
-.statCard { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px 18px; }
+.statCard { background: #fffdf9; border: 1px solid var(--border); padding: 18px; box-shadow: 0 12px 35px rgba(26,20,14,.03); }
 .statLabel { font-size: 10px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gray-mid); margin-bottom: 6px; }
 .statValue { font-family: var(--font-serif); font-size: 26px; font-weight: 700; }
 .orange { color: var(--orange); }
@@ -64,3 +65,25 @@
   cursor: pointer; font-family: var(--font-sans); white-space: nowrap;
 }
 .setBtn:hover { background: var(--orange-dark); }
+.productThumb { width: 38px; height: 44px; object-fit: cover; background: var(--gray-light); border: 1px solid var(--border); }
+.page :global(.card) { border-radius: 0; box-shadow: 0 12px 35px rgba(26,20,14,.03); }
+
+@media (max-width: 1050px) {
+  .statsRow { grid-template-columns: repeat(2, minmax(0,1fr)); }
+}
+
+@media (max-width: 768px) {
+  .page { padding: 22px 14px 38px; }
+  .pageHeader { align-items: flex-start; flex-direction: column; gap: 12px; margin-bottom: 18px; padding-bottom: 16px; }
+  .pageTitle { font-size: 28px; }
+  .statsRow { gap: 9px; }
+  .statCard { padding: 15px 13px; }
+  .statValue { font-size: 21px; overflow-wrap: anywhere; }
+  .filterRow { margin-left: -14px; margin-right: -14px; padding: 0 14px 5px; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+  .filterRow::-webkit-scrollbar { display: none; }
+  .filterBtn { flex-shrink: 0; }
+}
+
+@media (max-width: 390px) {
+  .statsRow { grid-template-columns: 1fr; }
+}

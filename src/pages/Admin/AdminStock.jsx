@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { supabase } from '../../supabase/client'
+import { getProductImage } from '../../lib/productImages'
+import { SHOP_CONFIG } from '../../lib/shopConfig'
+import { RefreshIcon } from '../../components/icons/AdminIcons'
 import styles from './AdminStock.module.css'
 
 export default function AdminStock() {
@@ -64,8 +67,8 @@ export default function AdminStock() {
   return (
     <div className={styles.page}>
       <div className={styles.pageHeader}>
-        <h1 className={styles.pageTitle}>Gestion du Stock</h1>
-        <button className="btn btn-outline btn-sm" onClick={fetchProducts}>🔄 Actualiser</button>
+        <h1 className={styles.pageTitle}>Gestion du stock</h1>
+        <button className="btn btn-outline btn-sm" onClick={fetchProducts}><RefreshIcon size={16} /> Actualiser</button>
       </div>
 
       <div className={styles.statsRow}>
@@ -75,8 +78,8 @@ export default function AdminStock() {
         <div className={styles.statCard}><div className={styles.statLabel}>Stock bas</div><div className={`${styles.statValue} ${counts.Bas>0?styles.warn:styles.green}`}>{counts.Bas}</div></div>
       </div>
 
-      {counts.Critique>0 && <div className="alert alert-danger">🚨 <strong>{counts.Critique} produit(s) en rupture !</strong></div>}
-      {counts.Bas>0      && <div className="alert alert-warning">⚠️ <strong>{counts.Bas} produit(s)</strong> avec un stock bas.</div>}
+      {counts.Critique>0 && <div className="alert alert-danger"><strong>{counts.Critique} produit(s) en rupture !</strong></div>}
+      {counts.Bas>0      && <div className="alert alert-warning"><strong>{counts.Bas} produit(s)</strong> avec un stock bas.</div>}
 
       <div className={styles.filterRow}>
         {Object.entries(counts).map(([key,count]) => (
@@ -94,9 +97,10 @@ export default function AdminStock() {
               <tbody>
                 {filtered.map(p => {
                   const st = getStatus(p)
+                  const image = getProductImage(p)
                   return (
                     <tr key={p.id}>
-                      <td style={{fontSize:22,textAlign:'center',width:48}}>{p.emoji}</td>
+                      <td style={{width:54}}><img className={styles.productThumb} src={image || SHOP_CONFIG.logo} alt="" /></td>
                       <td><strong>{p.name}</strong><div style={{fontSize:11,color:'var(--gray-mid)'}}>{p.material}</div></td>
                       <td><span className="badge badge-progress" style={{fontSize:9}}>{p.category}</span></td>
                       <td><span className={`${styles.stockNum} ${p.stock===0?styles.stockNumCritical:p.stock<=(p.alert_stock||3)?styles.stockNumLow:p.stock<=(p.alert_stock||3)*2?styles.stockNumWarn:styles.stockNumOk}`}>{p.stock}</span></td>

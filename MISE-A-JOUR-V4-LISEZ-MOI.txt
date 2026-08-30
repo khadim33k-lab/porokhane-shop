@@ -1,0 +1,15 @@
+POROKHANE SHOP — ADMINISTRATION + VERSION MOBILE V4
+
+INSTALLATION
+1. Décompressez le ZIP dans le dossier principal porokhane-supabase.
+2. Acceptez le remplacement des fichiers existants.
+3. Dans le terminal VS Code, lancez : npm run dev
+4. Dans le navigateur, utilisez Ctrl+Shift+R.
+
+VÉRIFICATIONS CONSEILLÉES
+- Ouvrir /admin sur ordinateur et sur téléphone.
+- Tester le menu, les commandes, les produits, le stock, les statistiques et les paramètres.
+- Tester l’accueil, la boutique, une fiche produit, le panier et la commande sur téléphone.
+- Vérifier les filtres de la boutique en faisant défiler les boutons horizontalement.
+
+Cette mise à jour ne contient aucun fichier .env ni aucune clé confidentielle.

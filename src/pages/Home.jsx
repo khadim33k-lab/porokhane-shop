@@ -1,138 +1,131 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useProducts } from '../hooks/useProducts'
-import Navbar      from '../components/Navbar/Navbar'
+import { productMatchesUniverse, SHOP_UNIVERSES } from '../lib/catalog'
+import { SHOP_CONFIG, whatsappLink } from '../lib/shopConfig'
+import Navbar from '../components/Navbar/Navbar'
 import ProductCard from '../components/Product/ProductCard'
-import Footer      from '../components/Footer'
-import styles      from './Home.module.css'
-
-const LOGO_URL = 'https://fedznkkxobzgzsbybozb.supabase.co/storage/v1/object/public/product-images/Porokhane%20SHOP.png'
-
-const CATS = ['Tous', 'Pashmina', 'Jersey', 'Cashmere', 'Crêpe & Soie', 'Accessoires']
-const MATS = ['Toutes', 'Pashmina', 'Cashmere', 'Jersey', 'Crêpe', 'Soie', 'Chiffon', 'Viscose']
+import WhatsAppIcon from '../components/icons/WhatsAppIcon'
+import Footer from '../components/Footer'
+import styles from './Home.module.css'
 
 export default function Home() {
-  const [activeCat, setActiveCat] = useState('Tous')
-  const [activeMat, setActiveMat] = useState('Toutes')
+  const [activeUniverse, setActiveUniverse] = useState('Tous')
   const { products, loading } = useProducts()
 
-  const filtered = products.filter(p => {
-    const okCat = activeCat === 'Tous' || p.category === activeCat
-    const okMat = activeMat === 'Toutes' || p.material === activeMat
-    return okCat && okMat
-  })
+  const selectedProducts = products
+    .filter(product => productMatchesUniverse(product, activeUniverse))
+    .slice(0, 8)
 
   return (
     <>
       <Navbar />
 
-      {/* BARRE PROMO */}
-      <div className={styles.promoBar}>
-        <span>🚚 Livraison rapide Dakar et banlieue</span>
-        <span>📞 78 536 34 25</span>
-        <span>📍 Guediawaye Hamo4</span>
-        <span>💳 Wave · Orange Money · Espèces</span>
-      </div>
-
-      {/* HERO */}
-      <section className={styles.hero}>
-        <div className={styles.heroContent}>
-          <span className={styles.heroBadge}>✨ Nouvelle Collection 2026</span>
-          <h1 className={styles.heroTitle}>
-            Voiles &<br /><em>Accessoires</em><br />de Prestige
-          </h1>
-          <p className={styles.heroSlogan}>
-            "Élégance, Pudeur et Classe<br />en parfait symbiose !"
-          </p>
-          <p className={styles.heroSub}>
-            Pashminas · Cashmere · Jersey · Crêpe · Soie<br />
-            Livraison à Dakar et toute la banlieue
-          </p>
-          <div className={styles.heroBtns}>
-            <Link to="/produits" className="btn btn-primary btn-lg">
-              Découvrir la boutique
-            </Link>
-            <a
-              href="https://wa.me/221785363425"
-              target="_blank" rel="noopener noreferrer"
-              className={styles.waHero}
-            >
-              💬 WhatsApp
-            </a>
+      <main>
+        <section className={styles.hero}>
+          <span className={styles.heroEdition}>Porokhane · Dakar</span>
+          <div className={styles.heroContent}>
+            <img src={SHOP_CONFIG.logo} alt="Logo Porokhane Shop" className={styles.heroLogo} />
+            <h1>Porokhane Shop</h1>
+            <p className={styles.heroSlogan}>{SHOP_CONFIG.slogan}</p>
+            <div className={styles.heroTags} aria-label="Univers de la boutique">
+              <span>Mode & Voiles</span>
+              <span>Accessoires</span>
+            </div>
+            <div className={styles.heroActions}>
+              <Link to="/produits" className={styles.primaryAction}>Explorer la boutique</Link>
+              <a
+                href={whatsappLink('Bonjour Porokhane Shop, je souhaite découvrir vos produits.')}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.whatsappAction}
+              >
+                <WhatsAppIcon size={21} /> WhatsApp
+              </a>
+            </div>
           </div>
-        </div>
+          <span className={styles.heroSideText}>Élégance · Pudeur · Classe</span>
+        </section>
 
-        {/* CÔTÉ DROIT HERO — Logo + déco */}
-        <div className={styles.heroVisual}>
-          <div className={styles.heroLogoWrap}>
-            <img
-              src={LOGO_URL}
-              alt="Porokhane Shop"
-              className={styles.heroLogo}
-            />
-            <div className={styles.heroLogoBg} />
+        <section className={styles.universes} aria-label="Catégories principales">
+          <Link to="/produits?cat=Mode%20%26%20Voiles" className={styles.universeCard}>
+            <div className={styles.universeNumber}>01</div>
+            <div>
+              <p>Notre sélection textile</p>
+              <h2>Mode & Voiles</h2>
+              <span>Découvrir la collection →</span>
+            </div>
+            <div className={styles.fabricVisual} aria-hidden="true"><i /><i /><i /></div>
+          </Link>
+
+          <Link to="/produits?cat=Accessoires" className={`${styles.universeCard} ${styles.accessoryCard}`}>
+            <div className={styles.universeNumber}>02</div>
+            <div>
+              <p>Technologie & quotidien</p>
+              <h2>Accessoires</h2>
+              <span>Zikr Ring, chapelets électroniques et plus →</span>
+            </div>
+            <div className={styles.accessoryVisual} aria-hidden="true">
+              <div className={styles.ringVisual}><i /></div>
+              <div className={styles.beadsVisual}>{Array.from({ length: 8 }, (_, index) => <i key={index} />)}</div>
+            </div>
+          </Link>
+        </section>
+
+        <section className={styles.selection}>
+          <div className={styles.sectionHeader}>
+            <div>
+              <p className={styles.kicker}>Sélection du moment</p>
+              <h2>Découvrez la boutique</h2>
+            </div>
+            <div className={styles.filters} aria-label="Filtrer les produits">
+              {SHOP_UNIVERSES.map(universe => (
+                <button
+                  type="button"
+                  key={universe}
+                  className={activeUniverse === universe ? styles.activeFilter : ''}
+                  onClick={() => setActiveUniverse(universe)}
+                >
+                  {universe === 'Tous' ? 'Tout voir' : universe}
+                </button>
+              ))}
+            </div>
           </div>
-          <div className={styles.heroGrid}>
-            <div className={styles.heroGridItem}>🌸</div>
-            <div className={styles.heroGridItem}>✨</div>
+
+          {loading ? (
+            <div className="spinner" />
+          ) : selectedProducts.length > 0 ? (
+            <div className={styles.productGrid}>
+              {selectedProducts.map(product => <ProductCard key={product.id} product={product} />)}
+            </div>
+          ) : (
+            <p className={styles.empty}>Les nouveaux articles seront bientôt disponibles.</p>
+          )}
+
+          <div className={styles.allProducts}>
+            <Link to="/produits">Voir tous les produits</Link>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* FILTRES MATIÈRES */}
-      <section className={styles.matSection}>
-        <p className={styles.matTitle}>Filtrer par matière</p>
-        <div className={styles.matGrid}>
-          {MATS.map(m => (
-            <button
-              key={m}
-              className={`${styles.matPill} ${activeMat === m ? styles.active : ''}`}
-              onClick={() => setActiveMat(m)}
-            >{m}</button>
-          ))}
-        </div>
-      </section>
-
-      {/* CATALOGUE */}
-      <section className="container" style={{ paddingBottom: '64px' }}>
-        <div className={styles.catBar}>
-          {CATS.map(c => (
-            <button
-              key={c}
-              className={`${styles.catPill} ${activeCat === c ? styles.active : ''}`}
-              onClick={() => setActiveCat(c)}
-            >{c}</button>
-          ))}
-        </div>
-
-        <div className={styles.catalogHeader}>
-          <h2 className={styles.catalogTitle}>
-            {activeCat === 'Tous' ? 'Notre Collection' : activeCat}
-          </h2>
-          <span style={{ fontSize: '12px', color: 'var(--gray-mid)' }}>
-            {filtered.length} article{filtered.length > 1 ? 's' : ''}
-          </span>
-        </div>
-
-        {loading ? (
-          <div className="spinner" />
-        ) : (
-          <div className={styles.productsGrid}>
-            {filtered.map(p => <ProductCard key={p.id} product={p} />)}
+        <section className={styles.campaign}>
+          <div className={styles.campaignImage} role="img" aria-label="Univers élégant Porokhane Shop" />
+          <div className={styles.campaignContent}>
+            <p className={styles.kicker}>L’univers Porokhane</p>
+            <h2>Une boutique,<br />plusieurs envies.</h2>
+            <p>
+              Mode, voiles et accessoires — dont Zikr Ring iQibla et chapelets électroniques —
+              réunis dans une sélection utile, élégante et pensée pour votre quotidien.
+            </p>
+            <Link to="/produits">Découvrir notre sélection →</Link>
           </div>
-        )}
-      </section>
+        </section>
 
-      {/* SLOGAN */}
-      <section className={styles.sloganSection}>
-        <div className={styles.sloganLogo}>
-          <img src={LOGO_URL} alt="Porokhane Shop" className={styles.sloganLogoImg} />
-        </div>
-        <h2 className={styles.sloganText}>
-          "Élégance, Pudeur et Classe<br /><em>en parfait symbiose !"</em>
-        </h2>
-        <p className={styles.sloganBrand}>— Porokhane Shop ✨ · Guediawaye, Sénégal</p>
-      </section>
+        <section className={styles.trust} aria-label="Nos engagements">
+          <div><strong>Sélection contrôlée</strong><span>Des articles choisis avec soin</span></div>
+          <div><strong>Livraison rapide</strong><span>Dakar et environs</span></div>
+          <div><strong>Conseil personnalisé</strong><span>Une réponse directe sur WhatsApp</span></div>
+        </section>
+      </main>
 
       <Footer />
     </>

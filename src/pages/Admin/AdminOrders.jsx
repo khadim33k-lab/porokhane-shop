@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { supabase } from '../../supabase/client'
+import WhatsAppIcon from '../../components/icons/WhatsAppIcon'
+import { OrdersIcon, RefreshIcon } from '../../components/icons/AdminIcons'
 import styles from './AdminOrders.module.css'
 
 const STATUSES = ['Tous', 'Nouveau', 'En cours', 'Livré', 'Annulé']
@@ -99,22 +101,21 @@ export default function AdminOrders() {
             </span>
           )}
         </h1>
-        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+        <div className={styles.headerActions}>
           <input
-            className="form-input"
-            style={{ width: 220 }}
-            placeholder="🔍 Client, téléphone, ID..."
+            className={`form-input ${styles.searchInput}`}
+            placeholder="Client, téléphone ou référence…"
             value={search}
             onChange={e => setSearch(e.target.value)}
           />
-          <button className="btn btn-outline btn-sm" onClick={fetchOrders}>🔄</button>
+          <button className={styles.refreshBtn} onClick={fetchOrders} aria-label="Actualiser les commandes"><RefreshIcon size={18} /></button>
         </div>
       </div>
 
       {/* ALERTE ERREUR */}
       {error && (
         <div className="alert alert-danger">
-          ❌ Erreur : {error}
+          Erreur : {error}
           <br />
           <small>Vérifiez les règles RLS dans Supabase (voir instructions)</small>
         </div>
@@ -141,7 +142,7 @@ export default function AdminOrders() {
             <div className="spinner" style={{ margin: '40px auto' }} />
           ) : filtered.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '48px', color: 'var(--gray-mid)' }}>
-              <div style={{ fontSize: 48, marginBottom: 12 }}>📦</div>
+              <div className={styles.emptyIcon}><OrdersIcon size={30} /></div>
               <p style={{ fontSize: 16, fontFamily: 'var(--font-serif)' }}>
                 {orders.length === 0 ? 'Aucune commande pour l\'instant' : 'Aucune commande trouvée'}
               </p>
@@ -177,7 +178,7 @@ export default function AdminOrders() {
                     <td style={{ fontSize: 12, color: 'var(--gray-mid)' }}>{o.client_zone}</td>
                     <td style={{ fontSize: 12, maxWidth: 180 }}>
                       {(o.items || []).map(i => `${i.name} x${i.quantity}`).join(', ').substring(0, 50)}
-                      {o.note && <div style={{ fontSize: 11, color: 'var(--orange)', marginTop: 2 }}>📝 {o.note}</div>}
+                      {o.note && <div style={{ fontSize: 11, color: 'var(--orange)', marginTop: 2 }}>Note : {o.note}</div>}
                     </td>
                     <td style={{ fontWeight: 700, color: 'var(--orange)', whiteSpace: 'nowrap' }}>
                       {fmt(o.total)}
@@ -209,7 +210,7 @@ export default function AdminOrders() {
                           rel="noopener noreferrer"
                           className="btn btn-sm btn-success"
                           style={{ background: '#25D366', color: 'white', border: 'none' }}
-                        >💬</a>
+                        ><WhatsAppIcon size={16} /></a>
                         <button
                           className="btn btn-sm btn-danger"
                           onClick={() => deleteOrder(o.id)}
@@ -234,17 +235,17 @@ export default function AdminOrders() {
             </div>
             <div className={styles.modalBody}>
               <div className={styles.detailSection}>
-                <h3>🧕 Cliente</h3>
+                <h3>Cliente</h3>
                 <p><strong>{selected.client_name}</strong></p>
-                <p>📞 {selected.client_phone}</p>
-                <p>📍 {selected.client_zone} {selected.client_address ? `— ${selected.client_address}` : ''}</p>
+                <p>Téléphone : {selected.client_phone}</p>
+                <p>Adresse : {selected.client_zone} {selected.client_address ? `— ${selected.client_address}` : ''}</p>
               </div>
 
               <div className={styles.detailSection}>
-                <h3>🛍️ Produits commandés</h3>
+                <h3>Produits commandés</h3>
                 {(selected.items || []).map((item, i) => (
                   <div key={i} className={styles.orderItem}>
-                    <span>{item.emoji || '🧕'} {item.name}</span>
+                    <span>{item.name}</span>
                     <span>x{item.quantity}</span>
                     <span style={{ fontWeight: 600, color: 'var(--orange)' }}>
                       {fmt((item.price || 0) * (item.quantity || 1))}
@@ -257,10 +258,10 @@ export default function AdminOrders() {
               </div>
 
               <div className={styles.detailSection}>
-                <h3>💳 Paiement & Livraison</h3>
-                <p>💳 {selected.payment_method}</p>
-                <p>📦 Statut : <strong>{selected.status}</strong></p>
-                {selected.note && <p>📝 {selected.note}</p>}
+                <h3>Paiement et livraison</h3>
+                <p>Paiement : {selected.payment_method}</p>
+                <p>Statut : <strong>{selected.status}</strong></p>
+                {selected.note && <p>Note : {selected.note}</p>}
                 <p style={{ fontSize: 11, color: 'var(--gray-mid)', marginTop: 8 }}>
                   Commandé le {fmtDate(selected.created_at)}
                 </p>
@@ -277,7 +278,7 @@ export default function AdminOrders() {
                 rel="noopener noreferrer"
                 className="btn btn-success"
               >
-                💬 Contacter sur WhatsApp
+                <WhatsAppIcon size={18} /> Contacter sur WhatsApp
               </a>
               <button className="btn btn-outline" onClick={() => setSelected(null)}>Fermer</button>
             </div>

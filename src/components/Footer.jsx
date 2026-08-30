@@ -1,75 +1,55 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
+import { SHOP_CONFIG, whatsappLink } from '../lib/shopConfig'
+import WhatsAppIcon from './icons/WhatsAppIcon'
 import styles from './Footer.module.css'
 
-function Footer() {
+export default function Footer() {
   return (
     <footer className={styles.footer}>
-      <div className={`container ${styles.grid}`}>
-        <div>
-          <div className={styles.brand}>
-            <div className={styles.brandIcon}>🛍️</div>
-            <div>
-              <div className={styles.brandName}>Porokhane Shop</div>
-              <div className={styles.brandSlogan}>"Élégance, Pudeur et Classe en parfait symbiose !"</div>
-            </div>
-          </div>
-          <p className={styles.brandInfo}>
-            📍 Guediawaye, Hamo4 · Dakar, Sénégal<br />
-            📞 78 536 34 25<br />
-            🐦 @porokhaneshop
-          </p>
+      <div className={styles.main}>
+        <div className={styles.brand}>
+          <Link to="/" className={styles.brandLockup}>
+            <img src={SHOP_CONFIG.logo} alt="Logo Porokhane Shop" />
+            <span>Porokhane Shop</span>
+          </Link>
+          <p>{SHOP_CONFIG.slogan}</p>
+          <small>{SHOP_CONFIG.address}<br />{SHOP_CONFIG.phone}</small>
         </div>
 
         <div>
-          <h4 className={styles.colTitle}>Collections</h4>
-          <Link to="/produits?cat=Pashmina" className={styles.link}>Voiles Pashmina</Link>
-          <Link to="/produits?cat=Cashmere" className={styles.link}>Voiles Cashmere</Link>
-          <Link to="/produits?cat=Jersey" className={styles.link}>Voiles Jersey</Link>
-          <Link to="/produits?cat=Crêpe & Soie" className={styles.link}>Crêpe & Soie</Link>
-          <Link to="/produits?cat=Accessoires" className={styles.link}>Accessoires</Link>
+          <h2>La boutique</h2>
+          <Link to="/produits">Nouveautés</Link>
+          <Link to="/produits?cat=Mode%20%26%20Voiles">Mode & Voiles</Link>
+          <Link to="/produits?cat=Accessoires">Accessoires</Link>
         </div>
 
         <div>
-          <h4 className={styles.colTitle}>Informations</h4>
-          <span className={styles.link}>Livraison & retrait</span>
-          <span className={styles.link}>Comment commander</span>
-          <span className={styles.link}>Paiement Wave / OM</span>
-          <span className={styles.link}>Retours & échanges</span>
-          <Link to="/login" className={styles.link}>Espace Admin</Link>
+          <h2>Informations</h2>
+          <span>Livraison à Dakar et environs</span>
+          <span>Paiement à la livraison</span>
+          <Link to="/login">Espace administrateur</Link>
         </div>
 
         <div>
-          <h4 className={styles.colTitle}>Nous contacter</h4>
+          <h2>Nous contacter</h2>
           <a
-            href="https://wa.me/221785363425"
-            target="_blank" rel="noopener noreferrer"
-            className={`${styles.link} ${styles.waLink}`}
+            href={whatsappLink('Bonjour Porokhane Shop, je souhaite avoir des informations sur vos produits.')}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={styles.whatsapp}
           >
-            💬 WhatsApp
+            <WhatsAppIcon size={21} /> WhatsApp
           </a>
-          <a
-            href="https://twitter.com/porokhaneshop"
-            target="_blank" rel="noopener noreferrer"
-            className={styles.link}
-          >
-            🐦 X (Twitter)
-          </a>
-          <span className={styles.link}>📞 78 536 34 25</span>
-          <div className={styles.paymentMethods}>
-            <span>💙 Wave</span>
-            <span>🟠 Orange Money</span>
-            <span>💵 Espèces</span>
-          </div>
+          <span>{SHOP_CONFIG.phone}</span>
+          <span>Guédiawaye, Hamo 4, Dakar</span>
         </div>
       </div>
 
       <div className={styles.bottom}>
-        <span>© 2026 Porokhane Shop ✨ · Tous droits réservés</span>
-        <span>Bichri Groupe</span>
+        <span>© 2026 Porokhane Shop · Tous droits réservés</span>
+        <span>{SHOP_CONFIG.slogan}</span>
       </div>
     </footer>
   )
 }
-
-export default Footer

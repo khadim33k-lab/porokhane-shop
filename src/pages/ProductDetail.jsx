@@ -3,8 +3,12 @@ import { useParams, useNavigate, Link } from 'react-router-dom'
 import { supabase } from '../supabase/client'
 import { DEMO } from '../hooks/useProducts'
 import { useCart } from '../context/CartContext'
+import { getProductUniverse } from '../lib/catalog'
+import { SHOP_CONFIG } from '../lib/shopConfig'
 import Navbar from '../components/Navbar/Navbar'
 import ProductCard from '../components/Product/ProductCard'
+import WhatsAppIcon from '../components/icons/WhatsAppIcon'
+import { CashIcon, PhoneIcon, TruckIcon } from '../components/icons/StoreIcons'
 import Footer from '../components/Footer'
 import styles from './ProductDetail.module.css'
 
@@ -19,6 +23,7 @@ export default function ProductDetail() {
   const [currentImg, setCurrentImg] = useState(0)
   const [added, setAdded]         = useState(false)
   const [colorError, setColorError] = useState(false)
+  const universe = getProductUniverse(product || {})
 
   // ─── NOUVEAU : sélection couleur par pièce ───
   // Chaque pièce a sa propre couleur sélectionnée
@@ -149,7 +154,7 @@ export default function ProductDetail() {
       <div className={`container ${styles.breadcrumb}`}>
         <Link to="/">Accueil</Link><span>›</span>
         <Link to="/produits">Collection</Link><span>›</span>
-        <Link to={`/produits?cat=${product.category}`}>{product.category}</Link><span>›</span>
+        <Link to={`/produits?cat=${encodeURIComponent(universe)}`}>{universe}</Link><span>›</span>
         <span>{product.name}</span>
       </div>
 
@@ -161,7 +166,7 @@ export default function ProductDetail() {
             {allImages.length > 0 ? (
               <img src={allImages[currentImg]} alt={product.name} className={styles.productImage} />
             ) : (
-              <span className={styles.productEmoji}>{product.emoji || '🧕'}</span>
+              <img src={SHOP_CONFIG.logo} alt="Logo Porokhane Shop" className={styles.productLogo} />
             )}
             {discount > 0 && <span className={styles.discountBadge}>-{discount}%</span>}
             {allImages.length > 1 && (
@@ -185,7 +190,7 @@ export default function ProductDetail() {
         {/* ─── INFOS ─── */}
         <div className={styles.infoBlock}>
           <div className={styles.productHeader}>
-            <span className={styles.category}>{product.category}</span>
+            <span className={styles.category}>{universe}</span>
             {product.badge && <span className={`badge badge-${product.badge === 'Promo' ? 'promo' : 'new'}`}>{product.badge}</span>}
           </div>
 
@@ -209,7 +214,7 @@ export default function ProductDetail() {
             <div id="color-section" className={`${styles.colorsBlock} ${colorError ? styles.colorsError : ''}`}>
               <div className={styles.colorsHeader}>
                 <p className={styles.colorsTitle}>
-                  🎨 Choisissez vos coloris
+                  Choisissez vos coloris
                   <span className={styles.required}>*</span>
                 </p>
                 <span className={styles.totalPieces}>
@@ -278,7 +283,7 @@ export default function ProductDetail() {
               {/* RÉCAPITULATIF */}
               {colorLines.some(l => l.color) && (
                 <div className={styles.recap}>
-                  <p className={styles.recapTitle}>📋 Récapitulatif de votre commande :</p>
+                  <p className={styles.recapTitle}>Récapitulatif de votre commande</p>
                   {colorLines.map((l, i) => l.color && (
                     <div key={i} className={styles.recapLine}>
                       <span>• {l.color}</span>
@@ -316,15 +321,24 @@ export default function ProductDetail() {
               }
             </button>
             <button className={`btn btn-lg ${styles.waBtn}`} onClick={handleWhatsApp}>
-              💬 Commander sur WhatsApp
+              <WhatsAppIcon size={20} /> Commander sur WhatsApp
             </button>
           </div>
 
           {/* INFOS LIVRAISON */}
           <div className={styles.deliveryInfo}>
-            <div className={styles.deliveryItem}><span>🚚</span><div><strong>Livraison rapide</strong><p>Dakar, Pikine, Guediawaye, Parcelles, Thiaroye</p></div></div>
-            <div className={styles.deliveryItem}><span>💳</span><div><strong>Paiement flexible</strong><p>Wave · Orange Money · Free Money · Espèces</p></div></div>
-            <div className={styles.deliveryItem}><span>📞</span><div><strong>Contact direct</strong><p>78 536 34 25 · @porokhaneshop</p></div></div>
+            <div className={styles.deliveryItem}>
+              <div className={styles.deliveryIcon}><TruckIcon size={22} /></div>
+              <div><strong>Livraison rapide</strong><p>Dakar, Pikine, Guédiawaye, Parcelles et Thiaroye</p></div>
+            </div>
+            <div className={styles.deliveryItem}>
+              <div className={styles.deliveryIcon}><CashIcon size={22} /></div>
+              <div><strong>Paiement à la livraison</strong><p>Réglez votre commande lors de sa réception</p></div>
+            </div>
+            <div className={styles.deliveryItem}>
+              <div className={styles.deliveryIcon}><PhoneIcon size={22} /></div>
+              <div><strong>Contact direct</strong><p>78 536 34 25 · @porokhaneshop</p></div>
+            </div>
           </div>
         </div>
       </div>

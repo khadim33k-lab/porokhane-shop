@@ -15,6 +15,8 @@ const DEMO = [
   { id:'10',name:'Voile Chiffon Floral',   category:'Crêpe & Soie',material:'Chiffon', price:7500,  old_price:0,     stock:12, colors:'Jaune · Blanc · Corail · Vert',  badge:'Nouveau',  emoji:'🌻', bg_color:'#FFFBF0', active:true },
   { id:'11',name:'Épingles Hijab (lot 6)', category:'Accessoires', material:'—',        price:2500,  old_price:0,     stock:30, colors:'Doré · Argenté · Rosé',         badge:'',         emoji:'📿', bg_color:'#F0F5FF', active:true },
   { id:'12',name:'Bonnet Sous-Hijab',      category:'Accessoires', material:'Coton',    price:3000,  old_price:0,     stock:18, colors:'Noir · Blanc · Gris · Nude',     badge:'',         emoji:'🎀', bg_color:'#FFF0F8', active:true },
+  { id:'13',name:'Zikr Ring iQibla',       category:'Accessoires', material:'Technologie', price:0, old_price:0,      stock:10, colors:'Noir · Argenté',                badge:'Connecté', emoji:'', bg_color:'#F0ECE4', active:true },
+  { id:'14',name:'Chapelet électronique',  category:'Accessoires', material:'Technologie', price:0, old_price:0,      stock:14, colors:'Noir · Doré · Blanc',           badge:'Nouveau',  emoji:'', bg_color:'#F3EFE8', active:true },
 ]
 
 export function useProducts(filters = {}) {

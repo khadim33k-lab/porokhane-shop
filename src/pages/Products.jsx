@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { supabase } from '../supabase/client'
 import { DEMO } from '../hooks/useProducts'
+import { productMatchesUniverse, SHOP_UNIVERSES } from '../lib/catalog'
+import { SHOP_CONFIG } from '../lib/shopConfig'
 import Navbar from '../components/Navbar/Navbar'
 import ProductCard from '../components/Product/ProductCard'
+import { FilterIcon, SearchIcon } from '../components/icons/StoreIcons'
 import Footer from '../components/Footer'
 import styles from './Products.module.css'
 
-const CATEGORIES = ['Tous','Pashmina','Jersey','Cashmere','Crêpe & Soie','Chiffon','Viscose','Accessoires']
 const MATERIALS  = ['Toutes','Pashmina','Cashmere','Jersey','Crêpe','Soie','Chiffon','Viscose','Coton']
 const SORTS      = [{value:'new',label:'Nouveautés'},{value:'price-asc',label:'Prix croissant'},{value:'price-desc',label:'Prix décroissant'},{value:'promo',label:'Promotions'}]
 
@@ -16,7 +18,8 @@ export default function Products() {
   const [products, setProducts] = useState([])
   const [filtered, setFiltered] = useState([])
   const [loading, setLoading]   = useState(true)
-  const [activeCat, setActiveCat] = useState(searchParams.get('cat') || 'Tous')
+  const requestedCategory = searchParams.get('cat')
+  const [activeCat, setActiveCat] = useState(SHOP_UNIVERSES.includes(requestedCategory) ? requestedCategory : 'Tous')
   const [activeMat, setActiveMat] = useState('Toutes')
   const [sort, setSort]           = useState('new')
   const [priceMin, setPriceMin]   = useState('')
@@ -31,8 +34,12 @@ export default function Products() {
   }, [])
 
   useEffect(() => {
+    setActiveCat(SHOP_UNIVERSES.includes(requestedCategory) ? requestedCategory : 'Tous')
+  }, [requestedCategory])
+
+  useEffect(() => {
     let res = [...products]
-    if (activeCat !== 'Tous')    res = res.filter(p => p.category === activeCat)
+    if (activeCat !== 'Tous')    res = res.filter(p => productMatchesUniverse(p, activeCat))
     if (activeMat !== 'Toutes')  res = res.filter(p => p.material === activeMat)
     if (search.trim())           res = res.filter(p => p.name?.toLowerCase().includes(search.toLowerCase()) || p.material?.toLowerCase().includes(search.toLowerCase()))
     if (priceMin) res = res.filter(p => p.price >= Number(priceMin))
@@ -51,8 +58,9 @@ export default function Products() {
       <Navbar />
       <div className={styles.pageHeader}>
         <div className="container">
-          <h1 className={styles.pageTitle}>Notre Collection</h1>
-          <p className={styles.pageSlogan}>"Élégance, Pudeur et Classe en parfait symbiose !"</p>
+          <p className={styles.pageEyebrow}>Porokhane Shop</p>
+          <h1 className={styles.pageTitle}>La boutique</h1>
+          <p className={styles.pageSlogan}>{SHOP_CONFIG.slogan}</p>
         </div>
       </div>
       <div className={`container ${styles.layout}`}>
@@ -67,11 +75,11 @@ export default function Products() {
           </div>
           <div className={styles.filterBlock}>
             <p className={styles.filterLabel}>Catégorie</p>
-            {CATEGORIES.map(cat => (
+            {SHOP_UNIVERSES.map(cat => (
               <label key={cat} className={styles.radioRow}>
                 <input type="radio" name="cat" checked={activeCat===cat} onChange={()=>handleCat(cat)} />
                 <span>{cat}</span>
-                <span className={styles.filterCount}>{cat==='Tous'?products.length:products.filter(p=>p.category===cat).length}</span>
+                <span className={styles.filterCount}>{cat==='Tous'?products.length:products.filter(p=>productMatchesUniverse(p,cat)).length}</span>
               </label>
             ))}
           </div>
@@ -96,7 +104,7 @@ export default function Products() {
         <div className={styles.main}>
           <div className={styles.topBar}>
             <div className={styles.catPills}>
-              {CATEGORIES.map(cat => (
+              {SHOP_UNIVERSES.map(cat => (
                 <button key={cat} className={`${styles.catPill} ${activeCat===cat?styles.active:''}`} onClick={()=>handleCat(cat)}>{cat}</button>
               ))}
             </div>
@@ -106,14 +114,14 @@ export default function Products() {
                 {SORTS.map(s=><option key={s.value} value={s.value}>{s.label}</option>)}
               </select>
               <button className={`btn btn-outline btn-sm ${styles.filterToggle}`} onClick={()=>setShowFilters(!showFilters)}>
-                {showFilters?'✕ Fermer':'⚙ Filtres'}
+                {showFilters ? 'Fermer' : <><FilterIcon size={15} /> Filtres</>}
               </button>
             </div>
           </div>
           {loading ? <div className="spinner" style={{marginTop:60}} /> : (
             filtered.length === 0 ? (
               <div className={styles.empty}>
-                <div style={{fontSize:56,marginBottom:16}}>🔍</div>
+                <div className={styles.emptyIcon}><SearchIcon size={30} /></div>
                 <h3>Aucun produit trouvé</h3>
                 <p>Essayez d'autres filtres ou <button className={styles.resetLink} onClick={resetFilters}>réinitialisez</button></p>
               </div>

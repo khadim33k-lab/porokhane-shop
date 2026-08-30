@@ -69,7 +69,7 @@ export default function AdminSales() {
   return (
     <div className={styles.page}>
       <div className={styles.pageHeader}>
-        <h1 className={styles.pageTitle}>Statistiques des Ventes</h1>
+        <h1 className={styles.pageTitle}>Statistiques des ventes</h1>
         <div className={styles.periodBtns}>
           {[['7d','7 jours'],['30d','30 jours'],['90d','3 mois'],['all','Tout']].map(([v,l]) => (
             <button key={v} className={`${styles.periodBtn} ${period===v?styles.active:''}`} onClick={()=>setPeriod(v)}>{l}</button>
@@ -156,7 +156,7 @@ export default function AdminSales() {
                 : topList.map(([id,p],i) => (
                   <tr key={id}>
                     <td style={{fontWeight:700,color:i<3?'var(--orange)':'var(--gray-mid)'}}> #{i+1}</td>
-                    <td><span style={{marginRight:8}}>{p.emoji}</span><strong>{p.name}</strong></td>
+                    <td><strong>{p.name}</strong></td>
                     <td style={{fontWeight:600}}>{p.qty} unités</td>
                     <td style={{fontWeight:700,color:'var(--orange)'}}>{fmt(p.rev)}</td>
                   </tr>

@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react'
+import { getProductImage } from '../lib/productImages'
 
 const CartContext = createContext()
 
@@ -16,7 +17,13 @@ export function CartProvider({ children }) {
       const key = `${product.id}_${color}`
       const existing = prev.find(i => i.key === key)
       if (existing) return prev.map(i => i.key === key ? { ...i, quantity: i.quantity + quantity } : i)
-      return [...prev, { ...product, quantity, color, key }]
+      return [...prev, {
+        ...product,
+        image_url: getProductImage(product),
+        quantity,
+        color,
+        key
+      }]
     })
   }
 

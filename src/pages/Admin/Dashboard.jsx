@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../../supabase/client'
+import { AlertIcon, OrdersIcon, RevenueIcon, StockIcon } from '../../components/icons/AdminIcons'
 import styles from './Dashboard.module.css'
 
 export default function Dashboard() {
@@ -61,13 +62,13 @@ export default function Dashboard() {
 
       {stats.newOrders > 0 && (
         <div className="alert alert-warning">
-          📦 <strong>{stats.newOrders} nouvelle(s) commande(s)</strong> en attente.{' '}
+          <strong>{stats.newOrders} nouvelle(s) commande(s)</strong> en attente.{' '}
           <Link to="/admin/commandes" style={{fontWeight:600,textDecoration:'underline'}}>Traiter →</Link>
         </div>
       )}
       {stats.lowStock > 0 && (
         <div className="alert alert-danger">
-          ⚠️ <strong>{stats.lowStock} produit(s)</strong> en stock bas.{' '}
+          <strong>{stats.lowStock} produit(s)</strong> en stock bas.{' '}
           <Link to="/admin/stock" style={{fontWeight:600,textDecoration:'underline'}}>Gérer →</Link>
         </div>
       )}
@@ -77,25 +78,25 @@ export default function Dashboard() {
           <div className={styles.statLabel}>Chiffre d'affaires</div>
           <div className={styles.statValue} style={{color:'var(--orange)'}}>{fmt(stats.revenue)}</div>
           <div className={styles.statSub}>Commandes livrées</div>
-          <div className={styles.statIcon}>💰</div>
+          <div className={styles.statIcon}><RevenueIcon size={20} /></div>
         </div>
         <div className={`${styles.statCard} ${styles.statBlue}`}>
           <div className={styles.statLabel}>Total Commandes</div>
           <div className={styles.statValue}>{stats.orders}</div>
           <div className={styles.statSub}>Toutes commandes</div>
-          <div className={styles.statIcon}>📦</div>
+          <div className={styles.statIcon}><OrdersIcon size={20} /></div>
         </div>
         <div className={`${styles.statCard} ${styles.statGreen}`}>
           <div className={styles.statLabel}>Nouvelles</div>
           <div className={styles.statValue} style={{color: stats.newOrders>0?'var(--success)':'inherit'}}>{stats.newOrders}</div>
           <div className={styles.statSub}>À traiter</div>
-          <div className={styles.statIcon}>🆕</div>
+          <div className={styles.statIcon}><StockIcon size={20} /></div>
         </div>
         <div className={`${styles.statCard} ${stats.lowStock>0?styles.statRed:styles.statGreen}`}>
           <div className={styles.statLabel}>Alertes stock</div>
           <div className={styles.statValue} style={{color:stats.lowStock>0?'var(--danger)':'var(--success)'}}>{stats.lowStock}</div>
           <div className={styles.statSub}>{stats.lowStock>0?'Stock bas !':'Tout est OK'}</div>
-          <div className={styles.statIcon}>⚠️</div>
+          <div className={styles.statIcon}><AlertIcon size={20} /></div>
         </div>
       </div>
 

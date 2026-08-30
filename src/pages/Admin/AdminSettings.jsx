@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import { supabase } from '../../supabase/client'
+import { SHOP_CONFIG } from '../../lib/shopConfig'
+import { CashIcon } from '../../components/icons/StoreIcons'
 import styles from './AdminSettings.module.css'
 
 export default function AdminSettings() {
@@ -8,7 +10,7 @@ export default function AdminSettings() {
   const [tab, setTab]   = useState('boutique')
   const [saved, setSaved] = useState(false)
   const [shop, setShop] = useState({
-    name:'Porokhane Shop ✨', slogan:'Élégance, Pudeur et Classe en parfait symbiose !',
+    name:'Porokhane Shop', slogan:'Élégance, Pudeur et Classe en parfaite symbiose',
     phone:'78 536 34 25', whatsapp:'221785363425',
     address:'Guediawaye, Hamo4, Dakar', twitter:'@porokhaneshop',
     zones:'Dakar, Pikine, Guediawaye, Parcelles, Thiaroye',
@@ -30,7 +32,7 @@ export default function AdminSettings() {
     if (pwd.next.length < 6) { setPwdMsg({ type:'error', text:'Minimum 6 caractères.' }); return }
     const { error } = await supabase.auth.updateUser({ password: pwd.next })
     if (error) { setPwdMsg({ type:'error', text: error.message }); return }
-    setPwdMsg({ type:'success', text:'✅ Mot de passe modifié !' })
+    setPwdMsg({ type:'success', text:'Mot de passe modifié.' })
     setPwd({ current:'', next:'', confirm:'' })
   }
 
@@ -39,7 +41,7 @@ export default function AdminSettings() {
       <div className={styles.pageHeader}><h1 className={styles.pageTitle}>Paramètres</h1></div>
 
       <div className={styles.tabs}>
-        {[['boutique','🛍️ Boutique'],['compte','🔐 Compte'],['livraison','🚚 Livraison'],['paiement','💳 Paiement']].map(([id,label]) => (
+        {[['boutique','Boutique'],['compte','Compte'],['livraison','Livraison'],['paiement','Paiement']].map(([id,label]) => (
           <button key={id} className={`${styles.tab} ${tab===id?styles.tabActive:''}`} onClick={()=>setTab(id)}>{label}</button>
         ))}
       </div>
@@ -48,7 +50,7 @@ export default function AdminSettings() {
         <div className="card">
           <div className="card-header"><span className="card-title">Informations de la boutique</span></div>
           <div className="card-body">
-            {saved && <div className="alert alert-success">✅ Informations sauvegardées !</div>}
+            {saved && <div className="alert alert-success">Informations sauvegardées.</div>}
             <div className="form-grid">
               <div className="form-group"><label className="form-label">Nom</label><input className="form-input" value={shop.name} onChange={e=>setShop({...shop,name:e.target.value})} /></div>
               <div className="form-group"><label className="form-label">Slogan</label><input className="form-input" value={shop.slogan} onChange={e=>setShop({...shop,slogan:e.target.value})} /></div>
@@ -69,7 +71,7 @@ export default function AdminSettings() {
           <div className="card-header"><span className="card-title">Compte Admin</span></div>
           <div className="card-body">
             <div className={styles.accountInfo}>
-              <div className={styles.accountAvatar}>👤</div>
+              <img className={styles.accountAvatar} src={SHOP_CONFIG.logo} alt="Porokhane Shop" />
               <div><strong>Administrateur</strong><p>{user?.email}</p></div>
             </div>
             <hr style={{border:'none',borderTop:'1px solid var(--border)',margin:'20px 0'}} />
@@ -102,13 +104,16 @@ export default function AdminSettings() {
         <div className="card">
           <div className="card-header"><span className="card-title">Modes de paiement</span></div>
           <div className="card-body">
-            {[{name:'Wave',emoji:'💙'},{name:'Orange Money',emoji:'🟠'},{name:'Free Money',emoji:'🟢'},{name:'Espèces',emoji:'💵'}].map(pm => (
-              <div key={pm.name} className={styles.paymentRow}>
-                <div className={styles.paymentInfo}><span style={{fontSize:22}}>{pm.emoji}</span><strong>{pm.name}</strong></div>
-                <input className="form-input" style={{maxWidth:180}} defaultValue={shop.phone} placeholder="Numéro de réception" />
-                <label className={styles.toggleSwitch}><input type="checkbox" defaultChecked /><span className={styles.toggleSlider}></span><span style={{fontSize:12,marginLeft:8}}>Actif</span></label>
+            <div className={styles.paymentRow}>
+              <div className={styles.paymentInfo}>
+                <CashIcon size={24} />
+                <div>
+                  <strong>Paiement à la livraison</strong>
+                  <p style={{fontSize:11,color:'var(--gray-mid)',marginTop:3}}>Le client règle sa commande à la réception.</p>
+                </div>
               </div>
-            ))}
+              <span style={{fontSize:11,fontWeight:700,color:'var(--success)',textTransform:'uppercase'}}>Actif</span>
+            </div>
             <button className="btn btn-primary" style={{marginTop:20}} onClick={saveShop}>Enregistrer</button>
           </div>
         </div>

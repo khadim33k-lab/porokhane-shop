@@ -1,71 +1,23 @@
-.footer {
-  background: var(--black);
-  border-top: 3px solid var(--orange);
-  margin-top: 1px;
+.footer { background: #11100f; color: #fff; }
+.main { padding: 64px clamp(22px, 5vw, 80px) 50px; display: grid; grid-template-columns: 1.5fr .8fr 1fr .8fr; gap: clamp(30px, 5vw, 72px); }
+.brandLockup { display: inline-flex; align-items: center; gap: 12px; }
+.brandLockup img { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; }
+.brandLockup span { font-family: var(--font-display); font-size: 28px; }
+.brand > p { max-width: 330px; margin-top: 18px; color: var(--orange); font-family: var(--font-serif); font-size: 14px; font-style: italic; line-height: 1.6; }
+.brand small { display: block; margin-top: 17px; color: rgba(255,255,255,.42); font-size: 11px; line-height: 1.9; }
+.main h2 { margin-bottom: 18px; color: var(--orange); font-family: var(--font-sans); font-size: 10px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; }
+.main > div:not(.brand) a, .main > div:not(.brand) span { margin-bottom: 10px; display: block; color: rgba(255,255,255,.54); font-size: 12px; line-height: 1.65; }
+.main > div:not(.brand) a:hover { color: #fff; }
+.main .whatsapp { width: max-content; padding: 10px 15px; display: inline-flex !important; align-items: center; gap: 8px; border-radius: 999px; background: #25d366; color: #fff !important; font-weight: 700; }
+.bottom { padding: 18px clamp(22px, 5vw, 80px); display: flex; justify-content: space-between; gap: 24px; border-top: 1px solid rgba(255,255,255,.09); color: rgba(255,255,255,.32); font-size: 9px; letter-spacing: .08em; text-transform: uppercase; }
+
+@media (max-width: 920px) {
+  .main { grid-template-columns: 1.4fr 1fr; }
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: 1.5fr 1fr 1fr 1fr;
-  gap: 36px;
-  padding-top: 48px;
-  padding-bottom: 40px;
-}
-
-.brand { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 16px; }
-.brandIcon {
-  width: 44px; height: 44px;
-  background: var(--orange); border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 22px; flex-shrink: 0;
-}
-.brandName { font-family: var(--font-serif); font-size: 16px; color: var(--white); font-weight: 700; }
-.brandSlogan { font-size: 11px; color: var(--orange); font-style: italic; margin-top: 2px; }
-.brandInfo { font-size: 12px; color: rgba(255,255,255,0.5); line-height: 1.9; }
-
-.colTitle {
-  font-size: 10px; font-weight: 700;
-  letter-spacing: 2.5px; text-transform: uppercase;
-  color: var(--orange); margin-bottom: 14px;
-}
-
-.link {
-  display: block;
-  font-size: 13px;
-  color: rgba(255,255,255,0.55);
-  margin-bottom: 8px;
-  cursor: pointer;
-  transition: color 0.15s;
-  text-decoration: none;
-}
-.link:hover { color: var(--orange); }
-
-.waLink { color: #25D366 !important; font-weight: 500; }
-.waLink:hover { color: #1ebe5d !important; }
-
-.paymentMethods {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-top: 12px;
-  font-size: 12px;
-  color: rgba(255,255,255,0.4);
-}
-
-.bottom {
-  border-top: 1px solid rgba(255,255,255,0.08);
-  padding: 16px 24px;
-  display: flex;
-  justify-content: space-between;
-  font-size: 11px;
-  color: rgba(255,255,255,0.3);
-}
-
-@media (max-width: 768px) {
-  .grid { grid-template-columns: 1fr 1fr; }
-  .bottom { flex-direction: column; gap: 6px; text-align: center; }
-}
-
-@media (max-width: 480px) {
-  .grid { grid-template-columns: 1fr; }
+@media (max-width: 560px) {
+  .main { padding: 46px 20px 38px; grid-template-columns: 1fr; gap: 34px; }
+  .bottom { padding: 18px 20px; flex-direction: column; text-align: center; }
+  .brandLockup img { width: 54px; height: 54px; }
+  .brandLockup span { font-size: 24px; }
 }

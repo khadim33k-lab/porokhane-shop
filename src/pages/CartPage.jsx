@@ -1,8 +1,11 @@
 import React from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
+import { getProductImage } from '../lib/productImages'
+import { SHOP_CONFIG } from '../lib/shopConfig'
 import Navbar from '../components/Navbar/Navbar'
 import Footer from '../components/Footer'
+import WhatsAppIcon from '../components/icons/WhatsAppIcon'
 import styles from './CartPage.module.css'
 
 function CartPage() {
@@ -16,9 +19,9 @@ function CartPage() {
       <>
         <Navbar />
         <div className={styles.emptyPage}>
-          <div className={styles.emptyIcon}>🛍️</div>
+          <img className={styles.emptyLogo} src={SHOP_CONFIG.logo} alt="Porokhane Shop" />
           <h2 className={styles.emptyTitle}>Votre panier est vide</h2>
-          <p className={styles.emptySub}>Découvrez notre collection de voiles et accessoires</p>
+          <p className={styles.emptySub}>Découvrez notre sélection Mode & Voiles et Accessoires</p>
           <Link to="/produits" className="btn btn-primary btn-lg">
             Explorer la boutique
           </Link>
@@ -40,39 +43,44 @@ function CartPage() {
         <div className={styles.cartLayout}>
           {/* LISTE DES ARTICLES */}
           <div className={styles.cartItems}>
-            {cartItems.map(item => (
-              <div key={item.key} className={styles.cartItem}>
-                <div className={styles.itemImg} style={{ background: item.bgColor || '#FFF6E8' }}>
-                  {item.imageUrl
-                    ? <img src={item.imageUrl} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '4px' }} />
-                    : <span>{item.emoji || '🧕'}</span>
-                  }
-                </div>
-                <div className={styles.itemInfo}>
-                  <div className={styles.itemTop}>
-                    <div>
-                      <h3 className={styles.itemName}>{item.name}</h3>
-                      <p className={styles.itemMeta}>
-                        {item.material && `${item.material}`}
-                        {item.color && ` · Coloris : ${item.color}`}
-                      </p>
-                    </div>
-                    <button className={styles.removeBtn} onClick={() => removeFromCart(item.key)} title="Retirer">✕</button>
+            {cartItems.map(item => {
+              const image = getProductImage(item)
+
+              return (
+                <div key={item.key} className={styles.cartItem}>
+                  <div className={styles.itemImg}>
+                    <img
+                      src={image || SHOP_CONFIG.logo}
+                      alt={image ? item.name : 'Porokhane Shop'}
+                      className={image ? styles.productImage : styles.fallbackLogo}
+                    />
                   </div>
-                  <div className={styles.itemBottom}>
-                    <div className={styles.qtyCtrl}>
-                      <button className={styles.qtyBtn} onClick={() => updateQuantity(item.key, item.quantity - 1)}>−</button>
-                      <span className={styles.qty}>{item.quantity}</span>
-                      <button className={styles.qtyBtn} onClick={() => updateQuantity(item.key, item.quantity + 1)}>+</button>
+                  <div className={styles.itemInfo}>
+                    <div className={styles.itemTop}>
+                      <div>
+                        <h3 className={styles.itemName}>{item.name}</h3>
+                        <p className={styles.itemMeta}>
+                          {item.material && `${item.material}`}
+                          {item.color && ` · Coloris : ${item.color}`}
+                        </p>
+                      </div>
+                      <button className={styles.removeBtn} onClick={() => removeFromCart(item.key)} title="Retirer">✕</button>
                     </div>
-                    <span className={styles.itemPrice}>{fmt(item.price * item.quantity)}</span>
+                    <div className={styles.itemBottom}>
+                      <div className={styles.qtyCtrl}>
+                        <button className={styles.qtyBtn} onClick={() => updateQuantity(item.key, item.quantity - 1)}>−</button>
+                        <span className={styles.qty}>{item.quantity}</span>
+                        <button className={styles.qtyBtn} onClick={() => updateQuantity(item.key, item.quantity + 1)}>+</button>
+                      </div>
+                      <span className={styles.itemPrice}>{fmt(item.price * item.quantity)}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              )
+            })}
 
             <div className={styles.cartActions}>
-              <button className="btn btn-outline btn-sm" onClick={clearCart}>🗑️ Vider le panier</button>
+              <button className="btn btn-outline btn-sm" onClick={clearCart}>Vider le panier</button>
               <Link to="/produits" className="btn btn-outline btn-sm">← Continuer mes achats</Link>
             </div>
           </div>
@@ -119,13 +127,11 @@ function CartPage() {
                   target="_blank" rel="noopener noreferrer"
                   className={styles.waBtn}
                 >
-                  💬 Commander via WhatsApp
+                  <WhatsAppIcon size={20} /> Commander via WhatsApp
                 </a>
 
                 <div className={styles.paymentIcons}>
-                  <span>💙 Wave</span>
-                  <span>🟠 Orange Money</span>
-                  <span>💵 Espèces</span>
+                  <span>Paiement à la livraison</span>
                 </div>
               </div>
             </div>

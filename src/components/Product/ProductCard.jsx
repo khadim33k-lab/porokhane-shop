@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useCart } from '../../context/CartContext'
+import { getProductUniverse } from '../../lib/catalog'
+import { SHOP_CONFIG } from '../../lib/shopConfig'
 import styles from './ProductCard.module.css'
 
 function ProductCard({ product }) {
@@ -24,6 +26,7 @@ function ProductCard({ product }) {
 
   const mainImage = getMainImage()
   const hasImage  = mainImage && !imgError
+  const universe = getProductUniverse(product)
 
   const handleAddToCart = (e) => {
     e.preventDefault()
@@ -31,7 +34,9 @@ function ProductCard({ product }) {
     addToCart(product, 1)
   }
 
-  const fmt = (n) => Number(n || 0).toLocaleString('fr-SN') + ' FCFA'
+  const fmt = (n) => Number(n || 0) > 0
+    ? Number(n).toLocaleString('fr-SN') + ' FCFA'
+    : 'Prix en boutique'
 
   return (
     <Link to={`/produits/${product.id}`} className={styles.card}>
@@ -49,7 +54,10 @@ function ProductCard({ product }) {
             loading="lazy"
           />
         ) : (
-          <span className={styles.emoji}>{product.emoji || '🧕'}</span>
+          <div className={styles.placeholder}>
+            <img src={SHOP_CONFIG.logo} alt="" aria-hidden="true" />
+            <span>{universe}</span>
+          </div>
         )}
 
         {/* TAG MATIÈRE */}
@@ -70,7 +78,7 @@ function ProductCard({ product }) {
 
       {/* INFOS */}
       <div className={styles.info}>
-        <div className={styles.category}>{product.category}</div>
+        <div className={styles.category}>{universe}</div>
         <h3 className={styles.name}>{product.name}</h3>
         {product.colors && (
           <p className={styles.colorsList}>{product.colors}</p>

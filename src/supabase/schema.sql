@@ -34,7 +34,7 @@ create table if not exists orders (
   client_address text,
   items          jsonb not null default '[]',
   total          integer not null,
-  payment_method text default 'Wave',
+  payment_method text default 'Espèces à la livraison',
   note           text,
   status         text default 'Nouveau',
   created_at     timestamptz default now(),

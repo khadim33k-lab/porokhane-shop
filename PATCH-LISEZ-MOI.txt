@@ -1,0 +1,18 @@
+POROKHANE SHOP — CORRECTION PANIER ET FICHE PRODUIT
+
+1. Fermez le serveur Vite avec Ctrl+C (facultatif, mais conseillé).
+2. Décompressez ce fichier ZIP dans le dossier principal porokhane-supabase,
+   celui qui contient package.json.
+3. Acceptez « Remplacer les fichiers ».
+4. Dans le terminal VS Code, lancez : npm run dev
+5. Rechargez le navigateur avec Ctrl+Shift+R.
+
+À TESTER
+- Ajoutez un produit au panier : sa vraie image Supabase doit apparaître.
+- Ouvrez le panier sur ordinateur et mobile.
+- Vérifiez les boutons et le bloc Livraison / Paiement / Contact de la fiche produit.
+
+Si un ancien article conservé dans le navigateur ne possède aucune URL d’image,
+videz une fois le panier puis ajoutez de nouveau le produit.
+
+Aucun fichier .env et aucune clé Supabase ne sont inclus dans ce correctif.

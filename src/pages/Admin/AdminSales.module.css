@@ -1,8 +1,9 @@
-.page { padding: 24px; }
-.pageHeader { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
-.pageTitle { font-family: var(--font-serif); font-size: 28px; font-weight: 700; }
+.page { padding: 32px 36px 54px; }
+.pageHeader { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 14px; }
+.pageTitle { font-family: var(--font-serif); font-size: 34px; font-weight: 500; line-height: 1.1; }
 
-.periodBtns { display: flex; gap: 6px; }
+.periodBtns { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
+.periodBtns::-webkit-scrollbar { display: none; }
 .periodBtn {
   padding: 7px 14px; border: 1px solid var(--border);
   background: var(--white); border-radius: 4px;
@@ -14,7 +15,7 @@
 
 /* KPI */
 .kpiGrid { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 20px; }
-.kpi { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 18px; position: relative; overflow: hidden; }
+.kpi { background: #fffdf9; border: 1px solid var(--border); padding: 20px 18px; position: relative; overflow: hidden; box-shadow: 0 12px 35px rgba(26,20,14,.03); }
 .kpiOr { border-top: 3px solid var(--orange); }
 .kpiLabel { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gray-mid); margin-bottom: 8px; }
 .kpiValue { font-family: var(--font-serif); font-size: 24px; font-weight: 700; margin-bottom: 4px; }
@@ -53,11 +54,25 @@
 .payBar { flex: 2; height: 4px; background: var(--border); border-radius: 2px; }
 .payBar div { height: 100%; background: var(--orange); border-radius: 2px; }
 .payCount { font-size: 11px; font-weight: 700; background: var(--gray-light); color: var(--gray-mid); padding: 2px 8px; border-radius: 10px; white-space: nowrap; }
+.page :global(.card) { border-radius: 0; box-shadow: 0 12px 35px rgba(26,20,14,.03); }
+.page :global(.card-title) { font-family: var(--font-serif); font-size: 16px; font-weight: 600; }
 
 @media (max-width: 900px) {
   .kpiGrid { grid-template-columns: repeat(2,1fr); }
   .twoCol { grid-template-columns: 1fr; }
 }
-@media (max-width: 480px) {
-  .kpiGrid { grid-template-columns: 1fr 1fr; }
+@media (max-width: 768px) {
+  .page { padding: 22px 14px 38px; }
+  .pageHeader { align-items: flex-start; flex-direction: column; gap: 12px; margin-bottom: 18px; padding-bottom: 16px; }
+  .pageTitle { font-size: 28px; }
+  .periodBtns { width: calc(100% + 28px); margin: 0 -14px; padding: 0 14px 4px; }
+  .periodBtn { flex-shrink: 0; }
+  .kpiGrid { gap: 9px; }
+  .kpi { padding: 16px 13px; }
+  .kpiLabel { min-height: 26px; font-size: 8px; }
+  .kpiValue { font-size: 20px; overflow-wrap: anywhere; }
+  .barChart { gap: 5px; padding-left: 10px; padding-right: 10px; }
+}
+@media (max-width: 390px) {
+  .kpiGrid { grid-template-columns: 1fr; }
 }
