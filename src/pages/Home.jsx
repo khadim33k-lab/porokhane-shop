@@ -107,7 +107,15 @@ export default function Home() {
         </section>
 
         <section className={styles.campaign}>
-          <div className={styles.campaignImage} role="img" aria-label="Univers élégant Porokhane Shop" />
+          <picture className={styles.campaignImage}>
+            <source srcSet="/images/porokhane-campaign-v16.webp" type="image/webp" />
+            <img
+              src="/images/porokhane-campaign-v16.jpg"
+              alt="Collection de voiles Porokhane Shop dans plusieurs coloris"
+              loading="lazy"
+              decoding="async"
+            />
+          </picture>
           <div className={styles.campaignContent}>
             <p className={styles.kicker}>L’univers Porokhane</p>
             <h2>Une boutique,<br />plusieurs envies.</h2>

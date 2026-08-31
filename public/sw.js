@@ -1,4 +1,4 @@
-const CACHE_NAME = 'porokhane-v14'
+const CACHE_NAME = 'porokhane-v16'
 const SHELL = ['/', '/index.html', '/manifest.json', '/images/porokhane-logo.webp']
 
 self.addEventListener('install', event => {

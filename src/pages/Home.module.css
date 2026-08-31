@@ -63,7 +63,9 @@
 .allProducts a { display: inline-block; padding-bottom: 5px; border-bottom: 1px solid #171513; font-size: 10px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; }
 
 .campaign { display: grid; grid-template-columns: 1.08fr .92fr; min-height: 540px; background: #12110f; color: #fff; }
-.campaignImage { min-height: 430px; background: linear-gradient(rgba(18,17,15,.08),rgba(18,17,15,.12)), url('/images/porokhane-campaign.webp') center 30% / cover no-repeat; }
+.campaignImage { position: relative; display: block; min-height: 430px; overflow: hidden; background: #211e1a; }
+.campaignImage::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(rgba(18,17,15,.04), rgba(18,17,15,.12)); }
+.campaignImage img { width: 100%; height: 100%; min-height: 430px; display: block; object-fit: cover; object-position: center; }
 .campaignContent { padding: clamp(50px, 7vw, 105px); display: flex; flex-direction: column; justify-content: center; }
 .campaignContent h2 { margin: 14px 0 24px; font-family: var(--font-display); font-size: clamp(46px, 6vw, 76px); font-weight: 400; line-height: 1.02; }
 .campaignContent > p:not(.kicker) { max-width: 520px; color: rgba(255,255,255,.62); font-size: 14px; line-height: 1.9; }
@@ -105,7 +107,7 @@
   .selection { padding: 48px 14px; }
   .productGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
   .campaign { grid-template-columns: 1fr; }
-  .campaignImage { min-height: 310px; }
+  .campaignImage, .campaignImage img { min-height: 310px; }
   .campaignContent { padding: 44px 20px; }
   .campaignContent h2 { font-size: 48px; }
   .trust { grid-template-columns: 1fr; }
