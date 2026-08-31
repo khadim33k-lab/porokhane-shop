@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { SHOP_CONFIG } from '../lib/shopConfig'
 import styles from './Login.module.css'
 
 export default function Login() {
@@ -18,8 +19,10 @@ export default function Login() {
     try {
       await login(email, password)
       navigate('/admin')
-    } catch {
-      setError('Email ou mot de passe incorrect')
+    } catch (err) {
+      if (err?.message?.includes('Délai')) setError('La connexion prend trop de temps. Vérifiez Internet puis réessayez.')
+      else if (err?.message?.includes('Accès refusé')) setError('Ce compte n’est pas autorisé à accéder à l’administration.')
+      else setError('Email ou mot de passe incorrect.')
     } finally {
       setLoading(false)
     }
@@ -29,7 +32,7 @@ export default function Login() {
     <div className={styles.loginPage}>
       <div className={styles.loginCard}>
         <div className={styles.loginLogo}>
-          <div className={styles.logoIcon}>🛍️</div>
+          <div className={styles.logoIcon}><img src={SHOP_CONFIG.logo} alt="Logo Porokhane Shop" /></div>
           <h1 className={styles.logoName}>Porokhane Shop</h1>
           <p className={styles.logoSub}>Panneau Administrateur</p>
         </div>

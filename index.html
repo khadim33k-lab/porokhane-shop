@@ -12,6 +12,27 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Porokhane" />
 
+    <script>
+      // En développement, un ancien cache PWA peut servir des fichiers React périmés.
+      // On le nettoie en arrière-plan et on ne réactive pas le SW en local.
+      window.__POROKHANE_IS_LOCAL__ = ['localhost', '127.0.0.1'].includes(window.location.hostname)
+
+      if (window.__POROKHANE_IS_LOCAL__) {
+        const unregisterWorkers = 'serviceWorker' in navigator
+          ? navigator.serviceWorker.getRegistrations().then(registrations =>
+              Promise.all(registrations.map(registration => registration.unregister()))
+            )
+          : Promise.resolve()
+        const clearCaches = 'caches' in window
+          ? caches.keys().then(keys => Promise.all(
+              keys.filter(key => key.startsWith('porokhane-')).map(key => caches.delete(key))
+            ))
+          : Promise.resolve()
+
+        Promise.allSettled([unregisterWorkers, clearCaches]).catch(() => {})
+      }
+    </script>
+
     <!-- ─── ICÔNE APPLE (iPhone) ─── -->
     <link rel="apple-touch-icon" href="/images/porokhane-logo.webp" />
 
@@ -25,6 +46,10 @@
     <meta property="og:description" content="Mode, voiles et accessoires. Élégance, Pudeur et Classe en parfaite symbiose." />
     <meta property="og:image" content="https://fedznkkxobzgzsbybozb.supabase.co/storage/v1/object/public/product-images/Porokhane%20SHOP.png" />
     <meta property="og:type" content="website" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Italiana&family=Manrope:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" media="print" onload="this.media='all'" />
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Italiana&family=Manrope:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" /></noscript>
 
     <!-- ─── SPLASH SCREEN iOS ─── -->
     <meta name="apple-mobile-web-app-status-bar-style" content="black" />
@@ -61,12 +86,22 @@
         background: #F5A623; border-radius: 2px;
         animation: load 1.2s ease forwards;
       }
+      #splash .retry-button {
+        min-height: 44px; padding: 10px 18px;
+        border: 1px solid #F5A623; border-radius: 999px;
+        background: transparent; color: #fff;
+        font: 600 12px/1.2 Arial, sans-serif;
+        cursor: pointer;
+      }
       @keyframes pop {
         from { transform: scale(.8); opacity: 0; }
         to   { transform: scale(1);  opacity: 1; }
       }
       @keyframes load {
         to { width: 100%; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        #splash, #splash img, #splash .loader-bar { animation: none; transition: none; }
       }
     </style>
   </head>
@@ -87,27 +122,45 @@
     <div id="root"></div>
 
     <script>
-      // Cacher le splash quand React est chargé
-      window.addEventListener('load', () => {
-        setTimeout(() => {
-          const splash = document.getElementById('splash')
-          if (splash) {
-            splash.classList.add('hide')
-            setTimeout(() => splash.remove(), 400)
-          }
-        }, 1200)
-      })
+      let slowLoadingTimer
 
-      // Enregistrer le Service Worker
-      if ('serviceWorker' in navigator) {
+      const hideSplash = () => {
+        const splash = document.getElementById('splash')
+        if (!splash || splash.classList.contains('hide')) return
+        clearTimeout(slowLoadingTimer)
+        splash.classList.add('hide')
+        setTimeout(() => splash.remove(), 350)
+      }
+      window.addEventListener('porokhane:ready', () => setTimeout(hideSplash, 180), { once: true })
+
+      const showLoadingHelp = () => {
+        const splash = document.getElementById('splash')
+        if (!splash || splash.classList.contains('hide')) return
+        const message = splash.querySelector('p')
+        const loader = splash.querySelector('.loader')
+        if (message) message.textContent = 'Le chargement prend plus de temps que prévu.'
+        if (loader) loader.remove()
+        if (!splash.querySelector('.retry-button')) {
+          const retry = document.createElement('button')
+          retry.type = 'button'
+          retry.className = 'retry-button'
+          retry.textContent = 'Réessayer'
+          retry.addEventListener('click', () => window.location.reload())
+          splash.appendChild(retry)
+        }
+      }
+      slowLoadingTimer = setTimeout(showLoadingHelp, 8000)
+
+      // Le service worker est réservé au site déployé, jamais au serveur Vite local.
+      if (!window.__POROKHANE_IS_LOCAL__ && 'serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js')
-            .then(() => console.log('✅ SW enregistré'))
-            .catch(err => console.log('SW erreur:', err))
+          navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' })
+            .then(registration => registration.update())
+            .catch(() => {})
         })
       }
     </script>
 
-    <script type="module" src="/src/main.jsx"></script>
+    <script type="module" src="/src/main.jsx?v=14"></script>
   </body>
 </html>

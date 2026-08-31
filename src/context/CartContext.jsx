@@ -5,16 +5,25 @@ const CartContext = createContext()
 
 export function CartProvider({ children }) {
   const [cartItems, setCartItems] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('porokhane_cart') || '[]') } catch { return [] }
+    try {
+      const parsed = JSON.parse(localStorage.getItem('porokhane_cart') || '[]')
+      if (!Array.isArray(parsed)) return []
+      return parsed.map((item, index) => ({
+        ...item,
+        key: item.key || `${item.id}_${item.color || ''}_${item.option_name || ''}_${item.option_value || ''}_${index}`
+      }))
+    } catch { return [] }
   })
 
   useEffect(() => {
     localStorage.setItem('porokhane_cart', JSON.stringify(cartItems))
   }, [cartItems])
 
-  const addToCart = (product, quantity = 1, color = '') => {
+  const addToCart = (product, quantity = 1, color = '', selectedOption = null) => {
     setCartItems(prev => {
-      const key = `${product.id}_${color}`
+      const optionName = String(selectedOption?.name || '').trim()
+      const optionValue = String(selectedOption?.value || '').trim()
+      const key = `${product.id}_${color}_${optionName}_${optionValue}`
       const existing = prev.find(i => i.key === key)
       if (existing) return prev.map(i => i.key === key ? { ...i, quantity: i.quantity + quantity } : i)
       return [...prev, {
@@ -22,6 +31,8 @@ export function CartProvider({ children }) {
         image_url: getProductImage(product),
         quantity,
         color,
+        option_name: optionName,
+        option_value: optionValue,
         key
       }]
     })

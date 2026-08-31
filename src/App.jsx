@@ -1,33 +1,43 @@
-import React from 'react'
+import React, { lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { CartProvider }  from './context/CartContext'
 import { AuthProvider, useAuth } from './context/AuthContext'
 
 import Home           from './pages/Home'
-import Products       from './pages/Products'
-import ProductDetail  from './pages/ProductDetail'
-import CartPage       from './pages/CartPage'
-import Checkout       from './pages/Checkout'
-import Login          from './pages/Login'
 
-import AdminLayout    from './pages/Admin/AdminLayout'
-import Dashboard      from './pages/Admin/Dashboard'
-import AdminProducts  from './pages/Admin/AdminProducts'
-import AdminOrders    from './pages/Admin/AdminOrders'
-import AdminStock     from './pages/Admin/AdminStock'
-import AdminSales     from './pages/Admin/AdminSales'
-import AdminSettings  from './pages/Admin/AdminSettings'
+const Products = lazy(() => import('./pages/Products'))
+const ProductDetail = lazy(() => import('./pages/ProductDetail'))
+const CartPage = lazy(() => import('./pages/CartPage'))
+const Checkout = lazy(() => import('./pages/Checkout'))
+const Login = lazy(() => import('./pages/Login'))
+const AdminLayout = lazy(() => import('./pages/Admin/AdminLayout'))
+const Dashboard = lazy(() => import('./pages/Admin/Dashboard'))
+const AdminProducts = lazy(() => import('./pages/Admin/AdminProducts'))
+const AdminOrders = lazy(() => import('./pages/Admin/AdminOrders'))
+const AdminStock = lazy(() => import('./pages/Admin/AdminStock'))
+const AdminSales = lazy(() => import('./pages/Admin/AdminSales'))
+const AdminSettings = lazy(() => import('./pages/Admin/AdminSettings'))
+
+function PageLoader({ compact = false }) {
+  return (
+    <div className={`page-loader ${compact ? 'page-loader-compact' : ''}`} role="status" aria-live="polite">
+      <img src="/images/porokhane-logo.webp" alt="" aria-hidden="true" />
+      <div><span>Porokhane Shop</span><small>Chargement en cours…</small></div>
+    </div>
+  )
+}
 
 // ✅ Fix #1 : vérifie user ET isAdmin
 function ProtectedRoute({ children }) {
   const { user, isAdmin, loading } = useAuth()
-  if (loading) return <div className="spinner" style={{ marginTop: 80 }} />
+  if (loading) return <PageLoader compact />
   if (!user || !isAdmin) return <Navigate to="/login" replace />
   return children
 }
 
 function AppRoutes() {
   return (
+    <Suspense fallback={<PageLoader />}>
     <Routes>
       {/* ─── PUBLIC ─── */}
       <Route path="/"             element={<Home />} />
@@ -51,6 +61,7 @@ function AppRoutes() {
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
+    </Suspense>
   )
 }
 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { supabase } from '../../supabase/client'
 import { SHOP_CONFIG } from '../../lib/shopConfig'
+import { splitOptionValues } from '../../lib/productOptions'
 import styles from './AdminProducts.module.css'
 
 const CATS   = ['Pashmina', 'Jersey', 'Cashmere', 'Crêpe & Soie', 'Chiffon', 'Viscose', 'Accessoires']
@@ -9,7 +10,8 @@ const BADGES = ['', 'Nouveau', 'Promo', 'Exclusif', 'Premium', 'Luxe']
 const emptyForm = {
   name: '', category: 'Pashmina', material: 'Pashmina',
   price: '', old_price: '', stock: '', alert_stock: '3',
-  colors: '', badge: '', emoji: '🧕', description: '', active: true
+  colors: '', option_enabled: false, option_name: 'Taille', option_values: '',
+  badge: '', emoji: '🧕', description: '', active: true
 }
 
 export default function AdminProducts() {
@@ -60,6 +62,9 @@ export default function AdminProducts() {
       material: p.material || '', price: p.price || '',
       old_price: p.old_price || 0, stock: p.stock || '',
       alert_stock: p.alert_stock || 3, colors: p.colors || '',
+      option_enabled: p.option_enabled === true,
+      option_name: p.option_name || 'Taille',
+      option_values: p.option_values || '',
       badge: p.badge || '', emoji: p.emoji || '🧕',
       description: p.description || '', active: p.active !== false
     })
@@ -104,6 +109,11 @@ export default function AdminProducts() {
       alert('Nom, prix et stock sont obligatoires.')
       return
     }
+    const normalizedOptionValues = splitOptionValues(form.option_values)
+    if (form.option_enabled && (!form.option_name.trim() || normalizedOptionValues.length === 0)) {
+      alert('Indiquez le nom de l’option et au moins une valeur, par exemple : Taille — 18 · 20 · 22.')
+      return
+    }
     setSaving(true)
     setUploading(imageFiles.length > 0)
 
@@ -128,6 +138,9 @@ export default function AdminProducts() {
         stock:       Number(form.stock),
         alert_stock: Number(form.alert_stock) || 3,
         colors:      form.colors.trim(),
+        option_enabled: form.option_enabled,
+        option_name: form.option_enabled ? form.option_name.trim() : null,
+        option_values: form.option_enabled ? normalizedOptionValues.join(' · ') : null,
         badge:       form.badge,
         emoji:       form.emoji,
         description: form.description.trim(),
@@ -137,11 +150,15 @@ export default function AdminProducts() {
         updated_at:  new Date().toISOString()
       }
 
+      let saveError
       if (editingId) {
-        await supabase.from('products').update(data).eq('id', editingId)
+        const { error } = await supabase.from('products').update(data).eq('id', editingId)
+        saveError = error
       } else {
-        await supabase.from('products').insert({ ...data, sales_count: 0 })
+        const { error } = await supabase.from('products').insert({ ...data, sales_count: 0 })
+        saveError = error
       }
+      if (saveError) throw saveError
 
       setShowModal(false)
       fetchProducts()
@@ -206,7 +223,7 @@ export default function AdminProducts() {
         <div className="card-header">
           <span className="card-title">{filtered.length} produit(s)</span>
         </div>
-        <div className="table-wrapper">
+        <div className={`table-wrapper ${styles.desktopTable}`}>
           {loading ? <div className="spinner" /> : (
             <table>
               <thead>
@@ -218,22 +235,17 @@ export default function AdminProducts() {
                   return (
                     <tr key={p.id}>
                       <td style={{ width: 100 }}>
-                        <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-                          {imgs.length > 0 ? imgs.slice(0, 3).map((img, i) => (
-                            <img key={i} src={img} alt="" style={{ width: 36, height: 36, objectFit: 'cover', borderRadius: 4, border: '1px solid var(--border)' }} />
-                          )) : (
-                            <img src={SHOP_CONFIG.logo} alt="" style={{ width: 36, height: 36, objectFit: 'contain', border: '1px solid var(--border)', opacity:.72 }} />
-                          )}
-                          {imgs.length > 3 && (
-                            <div style={{ width: 36, height: 36, background: 'var(--bg)', borderRadius: 4, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, color: 'var(--gray-mid)' }}>
-                              +{imgs.length - 3}
-                            </div>
-                          )}
+                        <div className={styles.tableImageWrap}>
+                          <img src={imgs[0] || SHOP_CONFIG.logo} alt={p.name} className={styles.tableImage} />
+                          {imgs.length > 1 && <span className={styles.imageCount}>+{imgs.length - 1}</span>}
                         </div>
                       </td>
                       <td>
                         <strong>{p.name}</strong>
-                        <div style={{ fontSize: 11, color: 'var(--gray-mid)' }}>{p.material} · {p.colors}</div>
+                        <div style={{ fontSize: 11, color: 'var(--gray-mid)' }}>
+                          {p.material} · {p.colors}
+                          {p.option_enabled && p.option_name && ` · ${p.option_name} : ${p.option_values}`}
+                        </div>
                       </td>
                       <td><span className="badge badge-progress">{p.category}</span></td>
                       <td style={{ fontWeight: 700, color: 'var(--orange)' }}>
@@ -270,6 +282,9 @@ export default function AdminProducts() {
             </table>
           )}
         </div>
+        {!loading && <div className={styles.mobileProducts}>
+          {filtered.length===0 ? <div className={styles.mobileEmpty}>Aucun produit trouvé.</div> : filtered.map(p=>{const imgs=getProductImages(p);return <article className={styles.productCard} key={p.id}><div className={styles.productCardMain}><img src={imgs[0]||SHOP_CONFIG.logo} alt={p.name}/><div><span>{p.category}</span><h2>{p.name}</h2><p>{p.material||'Matière non renseignée'}</p><strong>{fmt(p.price)}</strong></div><label className={styles.toggle}><input type="checkbox" checked={p.active!==false} onChange={()=>toggleActive(p)}/><span className={styles.toggleSlider}/></label></div><div className={styles.productCardMeta}><span>{p.stock} en stock</span><span>{imgs.length} photo{imgs.length>1?'s':''}</span><span>{p.active!==false?'Visible':'Masqué'}</span></div><div className={styles.productCardActions}><button className="btn btn-sm btn-outline" onClick={()=>openEdit(p)}>Modifier</button><button className="btn btn-sm btn-danger" onClick={()=>handleDelete(p)}>Supprimer</button></div></article>})}
+        </div>}
       </div>
 
       {/* MODAL */}
@@ -399,6 +414,47 @@ export default function AdminProducts() {
                 <label className="form-label">Coloris disponibles</label>
                 <input className="form-input" value={form.colors} onChange={e => setForm({ ...form, colors: e.target.value })} placeholder="Noir · Beige · Bordeaux · Rose" />
               </div>
+
+              <section className={`${styles.optionPanel} ${form.option_enabled ? styles.optionPanelActive : ''}`}>
+                <label className={styles.optionToggleRow}>
+                  <span>
+                    <strong>Ajouter une option au produit</strong>
+                    <small>Activez uniquement si le client doit faire un choix.</small>
+                  </span>
+                  <span className={styles.toggle}>
+                    <input
+                      type="checkbox"
+                      checked={form.option_enabled}
+                      onChange={e => setForm({ ...form, option_enabled: e.target.checked })}
+                    />
+                    <span className={styles.toggleSlider}></span>
+                  </span>
+                </label>
+
+                {form.option_enabled && (
+                  <div className={styles.optionFields}>
+                    <div className="form-group">
+                      <label className="form-label">Nom de l’option *</label>
+                      <input
+                        className="form-input"
+                        value={form.option_name}
+                        onChange={e => setForm({ ...form, option_name: e.target.value })}
+                        placeholder="Ex : Taille"
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">Choix proposés *</label>
+                      <input
+                        className="form-input"
+                        value={form.option_values}
+                        onChange={e => setForm({ ...form, option_values: e.target.value })}
+                        placeholder="18 · 20 · 22"
+                      />
+                      <small className={styles.optionHelp}>Séparez les choix avec une virgule ou le signe ·</small>
+                    </div>
+                  </div>
+                )}
+              </section>
 
               <div className="form-group">
                 <label className="form-label">Description</label>

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useCart } from '../../context/CartContext'
 import { getProductImage } from '../../lib/productImages'
 import { SHOP_CONFIG } from '../../lib/shopConfig'
+import { formatItemOption } from '../../lib/productOptions'
 import WhatsAppIcon from '../icons/WhatsAppIcon'
 import { BagIcon, CloseIcon } from '../icons/StoreIcons'
 import styles from './CartDrawer.module.css'
@@ -19,7 +20,10 @@ function CartDrawer({ isOpen, onClose }) {
   }
 
   const handleWhatsApp = () => {
-    const items = cartItems.map(i => `• ${i.name} x${i.quantity} = ${fmt(i.price * i.quantity)}`).join('\n')
+    const items = cartItems.map(i => {
+      const choices = [i.color && `Coloris : ${i.color}`, formatItemOption(i)].filter(Boolean).join(' · ')
+      return `• ${i.name} x${i.quantity}${choices ? ` — ${choices}` : ''} = ${fmt(i.price * i.quantity)}`
+    }).join('\n')
     const msg = `Bonjour Porokhane Shop ✨ !\n\nJe voudrais commander :\n${items}\n\n💰 Total : ${fmt(totalPrice)}\n\nMerci !`
     window.open(`https://wa.me/221785363425?text=${encodeURIComponent(msg)}`, '_blank')
   }
@@ -77,6 +81,7 @@ function CartDrawer({ isOpen, onClose }) {
                         <p className={styles.itemMeta}>
                           {item.material}
                           {item.color && ` · ${item.color}`}
+                          {item.option_value && ` · ${item.option_name || 'Option'} : ${item.option_value}`}
                         </p>
                       </div>
                       <button

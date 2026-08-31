@@ -23,7 +23,6 @@ export default function Home() {
 
       <main>
         <section className={styles.hero}>
-          <span className={styles.heroEdition}>Porokhane · Dakar</span>
           <div className={styles.heroContent}>
             <img src={SHOP_CONFIG.logo} alt="Logo Porokhane Shop" className={styles.heroLogo} />
             <h1>Porokhane Shop</h1>
@@ -122,7 +121,7 @@ export default function Home() {
 
         <section className={styles.trust} aria-label="Nos engagements">
           <div><strong>Sélection contrôlée</strong><span>Des articles choisis avec soin</span></div>
-          <div><strong>Livraison rapide</strong><span>Dakar et environs</span></div>
+          <div><strong>Livraison internationale</strong><span>Dakar et partout dans le monde</span></div>
           <div><strong>Conseil personnalisé</strong><span>Une réponse directe sur WhatsApp</span></div>
         </section>
       </main>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { supabase } from '../../supabase/client'
+import { withTimeout } from '../../lib/async'
 import styles from './AdminSales.module.css'
 
 export default function AdminSales() {
@@ -9,10 +10,10 @@ export default function AdminSales() {
   const [period, setPeriod]     = useState('all')
 
   useEffect(() => {
-    Promise.all([
+    withTimeout(Promise.all([
       supabase.from('orders').select('*').order('created_at', { ascending: false }),
       supabase.from('products').select('*')
-    ]).then(([{ data: o }, { data: p }]) => {
+    ])).then(([{ data: o }, { data: p }]) => {
       setOrders(o || [])
       setProducts(p || [])
       setLoading(false)
@@ -147,7 +148,7 @@ export default function AdminSales() {
 
       <div className="card" style={{marginTop:20}}>
         <div className="card-header"><span className="card-title">Top Produits Vendus</span></div>
-        <div className="table-wrapper">
+        <div className={`table-wrapper ${styles.desktopTable}`}>
           <table>
             <thead><tr><th>#</th><th>Produit</th><th>Qté vendue</th><th>Chiffre d'affaires</th></tr></thead>
             <tbody>
@@ -165,6 +166,7 @@ export default function AdminSales() {
             </tbody>
           </table>
         </div>
+        <div className={styles.mobileTopProducts}>{topList.length===0?<p>Aucune vente livrée</p>:topList.map(([id,p],i)=><div className={styles.mobileTopRow} key={id}><span>{String(i+1).padStart(2,'0')}</span><div><strong>{p.name}</strong><small>{p.qty} unité{p.qty>1?'s':''}</small></div><b>{fmt(p.rev)}</b></div>)}</div>
       </div>
     </div>
   )

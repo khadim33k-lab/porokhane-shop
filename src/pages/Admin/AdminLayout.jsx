@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Outlet, NavLink, useNavigate } from 'react-router-dom'
+import { Link, Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { SHOP_CONFIG } from '../../lib/shopConfig'
 import { CloseIcon } from '../../components/icons/StoreIcons'
@@ -26,11 +26,22 @@ const NAV_ITEMS = [
   { path:'/admin/parametres', label:'Paramètres',      icon:SettingsIcon },
 ]
 
+const PAGE_META = {
+  '/admin': { title: 'Vue d’ensemble', subtitle: 'Pilotez votre boutique en un coup d’œil' },
+  '/admin/commandes': { title: 'Commandes', subtitle: 'Suivez et traitez les demandes clientes' },
+  '/admin/produits': { title: 'Catalogue', subtitle: 'Gérez vos produits et disponibilités' },
+  '/admin/stock': { title: 'Stock', subtitle: 'Contrôlez les quantités et les alertes' },
+  '/admin/ventes': { title: 'Statistiques', subtitle: 'Analysez les ventes de Porokhane Shop' },
+  '/admin/parametres': { title: 'Paramètres', subtitle: 'Configurez votre boutique et votre compte' },
+}
+
 export default function AdminLayout() {
   const { user, logout }         = useAuth()
   const navigate                 = useNavigate()
-  const [collapsed, setCollapsed] = useState(false)
+  const location                 = useLocation()
+  const [collapsed, setCollapsed] = useState(() => localStorage.getItem('porokhane:admin-menu') === 'collapsed')
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const pageMeta = PAGE_META[location.pathname] || PAGE_META['/admin']
 
   useEffect(() => {
     document.body.classList.add('admin-page')
@@ -43,6 +54,14 @@ export default function AdminLayout() {
     document.body.style.overflow = 'hidden'
     return () => { document.body.style.overflow = previousOverflow }
   }, [drawerOpen])
+
+  useEffect(() => { setDrawerOpen(false) }, [location.pathname])
+
+  const toggleSidebar = () => setCollapsed(previous => {
+    const next = !previous
+    localStorage.setItem('porokhane:admin-menu', next ? 'collapsed' : 'expanded')
+    return next
+  })
 
   const handleLogout = async () => {
     await logout()
@@ -60,6 +79,7 @@ export default function AdminLayout() {
             end={item.end}
             className={({ isActive }) => `${styles.navItem} ${isActive ? styles.active : ''}`}
             onClick={onClose}
+            title={collapsed ? item.label : undefined}
           >
             <span className={styles.navIcon}><ItemIcon size={19} /></span>
             <span className={styles.navLabel}>{item.label}</span>
@@ -84,7 +104,7 @@ export default function AdminLayout() {
               </div>
             )}
           </div>
-          <button className={styles.toggleBtn} onClick={() => setCollapsed(!collapsed)} aria-label={collapsed ? 'Déployer le menu' : 'Réduire le menu'}>
+          <button className={styles.toggleBtn} onClick={toggleSidebar} aria-label={collapsed ? 'Déployer le menu' : 'Réduire le menu'}>
             {collapsed ? <ChevronRightIcon size={16} /> : <ChevronLeftIcon size={16} />}
           </button>
         </div>
@@ -109,10 +129,10 @@ export default function AdminLayout() {
 
       {/* ─── TOPBAR MOBILE ─── */}
       <div className={styles.mobileTopbar}>
-        <div className={styles.mobileLogoWrap}>
+        <Link to="/admin" className={styles.mobileLogoWrap}>
           <img className={styles.mobileLogoIcon} src={SHOP_CONFIG.logo} alt="Porokhane Shop" />
-          <div><span className={styles.mobileLogoName}>Porokhane Shop</span><small>Espace administrateur</small></div>
-        </div>
+          <div><span className={styles.mobileLogoName}>Porokhane Shop</span><small>{pageMeta.title}</small></div>
+        </Link>
         <button className={styles.hamburger} onClick={() => setDrawerOpen(true)} aria-label="Ouvrir le menu"><MenuIcon size={23} /></button>
       </div>
 
@@ -153,7 +173,14 @@ export default function AdminLayout() {
 
       {/* ─── CONTENU PRINCIPAL ─── */}
       <main className={styles.main}>
-        <Outlet />
+        <header className={styles.desktopTopbar}>
+          <div><p className={styles.topbarEyebrow}>Espace administrateur</p><h1>{pageMeta.title}</h1><p className={styles.topbarSubtitle}>{pageMeta.subtitle}</p></div>
+          <div className={styles.topbarActions}>
+            <Link to="/" className={styles.shopLink}>Voir la boutique <span>↗</span></Link>
+            <div className={styles.userChip}><span className={styles.userAvatar}>{(user?.email || 'A').charAt(0).toUpperCase()}</span><span className={styles.userChipText}><strong>Administrateur</strong><small>{user?.email}</small></span></div>
+          </div>
+        </header>
+        <div className={styles.content}><Outlet /></div>
       </main>
     </div>
   )

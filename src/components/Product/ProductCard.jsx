@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useCart } from '../../context/CartContext'
 import { getProductUniverse } from '../../lib/catalog'
 import { SHOP_CONFIG } from '../../lib/shopConfig'
+import { getProductOption } from '../../lib/productOptions'
 import styles from './ProductCard.module.css'
 
 function ProductCard({ product }) {
@@ -27,8 +28,10 @@ function ProductCard({ product }) {
   const mainImage = getMainImage()
   const hasImage  = mainImage && !imgError
   const universe = getProductUniverse(product)
+  const requiresSelection = Boolean(product.colors?.trim()) || getProductOption(product).enabled
 
   const handleAddToCart = (e) => {
+    if (requiresSelection) return
     e.preventDefault()
     e.stopPropagation()
     addToCart(product, 1)
@@ -67,8 +70,8 @@ function ProductCard({ product }) {
 
         {/* OVERLAY AU SURVOL */}
         <div className={styles.overlay}>
-          <button className={styles.addBtn} onClick={handleAddToCart}>
-            + Ajouter au panier
+          <button type="button" className={styles.addBtn} onClick={handleAddToCart}>
+            {requiresSelection ? 'Choisir les options' : '+ Ajouter au panier'}
           </button>
           {product.colors && (
             <span className={styles.colors}>{product.colors}</span>

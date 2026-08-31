@@ -1,6 +1,6 @@
-.page { max-width: 920px; padding: 32px 36px 54px; }
+.page { max-width:1020px; padding:30px clamp(22px,3vw,44px) 56px; }
 .pageHeader { margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
-.pageTitle { font-family: var(--font-serif); font-size: 34px; font-weight: 500; line-height: 1.1; }
+.pageTitle { font-family:var(--font-serif); font-size:clamp(28px,2.5vw,35px); font-weight:600; line-height:1.1; }
 
 .tabs { display: flex; gap: 5px; margin-bottom: 20px; overflow-x: auto; border-bottom: 1px solid var(--border); scrollbar-width: none; }
 .tabs::-webkit-scrollbar { display: none; }
@@ -8,7 +8,7 @@
 .tab:hover { color: var(--orange); }
 .tabActive { color: var(--black); border-bottom-color: var(--orange); }
 
-.page :global(.card) { border-radius: 0; box-shadow: 0 12px 35px rgba(26,20,14,.03); }
+.page :global(.card) { border-radius:14px; }
 .page :global(.card-header) { min-height: 60px; color: var(--white); background: #15120f; border-bottom-color: rgba(255,255,255,.08); }
 .page :global(.card-title) { font-family: var(--font-serif); font-size: 17px; font-weight: 500; }
 .page :global(.form-input), .page :global(.form-textarea) { border-radius: 0; }

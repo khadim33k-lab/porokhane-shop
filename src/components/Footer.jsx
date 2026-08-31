@@ -2,6 +2,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { SHOP_CONFIG, whatsappLink } from '../lib/shopConfig'
 import WhatsAppIcon from './icons/WhatsAppIcon'
+import { TikTokIcon, XIcon } from './icons/SocialIcons'
 import styles from './Footer.module.css'
 
 export default function Footer() {
@@ -26,7 +27,7 @@ export default function Footer() {
 
         <div>
           <h2>Informations</h2>
-          <span>Livraison à Dakar et environs</span>
+          <span>{SHOP_CONFIG.delivery}</span>
           <span>Paiement à la livraison</span>
           <Link to="/login">Espace administrateur</Link>
         </div>
@@ -43,6 +44,10 @@ export default function Footer() {
           </a>
           <span>{SHOP_CONFIG.phone}</span>
           <span>Guédiawaye, Hamo 4, Dakar</span>
+          <div className={styles.socials} aria-label="Réseaux sociaux">
+            <a href={SHOP_CONFIG.xUrl} target="_blank" rel="noopener noreferrer" aria-label="Suivre Porokhane Shop sur X"><XIcon size={17} /><span>X</span></a>
+            <a href={SHOP_CONFIG.tiktokUrl} target="_blank" rel="noopener noreferrer" aria-label="Suivre Porokhane Shop sur TikTok"><TikTokIcon size={18} /><span>TikTok</span></a>
+          </div>
         </div>
       </div>
 

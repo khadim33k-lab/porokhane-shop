@@ -90,7 +90,7 @@ export default function AdminStock() {
       </div>
 
       <div className="card">
-        <div className="table-wrapper">
+        <div className={`table-wrapper ${styles.desktopTable}`}>
           {loading ? <div className="spinner" /> : (
             <table>
               <thead><tr><th></th><th>Produit</th><th>Catégorie</th><th>Stock</th><th>Seuil</th><th>État</th><th>Valeur</th><th>Ajuster</th></tr></thead>
@@ -124,6 +124,7 @@ export default function AdminStock() {
             </table>
           )}
         </div>
+        {!loading && <div className={styles.mobileStockList}>{filtered.map(p=>{const st=getStatus(p);const image=getProductImage(p);return <article className={styles.stockCard} key={p.id}><div className={styles.stockCardHead}><img src={image||SHOP_CONFIG.logo} alt={p.name}/><div><span>{p.category}</span><h2>{p.name}</h2><p>{fmt(p.stock*p.price)} de valeur</p></div><strong>{p.stock}</strong></div><div className={styles.stockCardControls}><button onClick={()=>handleDelta(p,-1)}>−</button><span>{p.stock} unité{p.stock>1?'s':''}</span><button onClick={()=>handleDelta(p,1)}>+</button><button onClick={()=>handleSetStock(p)}>Définir</button></div><div className={styles.stockCardFooter}><span className={`${styles.statusBadge} ${st.cls}`}>{st.label}</span><label>Seuil <input type="number" min="1" max="50" value={p.alert_stock||3} onChange={e=>updateAlert(p.id,e.target.value)}/></label></div></article>})}</div>}
       </div>
     </div>
   )

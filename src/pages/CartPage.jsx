@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
 import { getProductImage } from '../lib/productImages'
 import { SHOP_CONFIG } from '../lib/shopConfig'
+import { formatItemOption } from '../lib/productOptions'
 import Navbar from '../components/Navbar/Navbar'
 import Footer from '../components/Footer'
 import WhatsAppIcon from '../components/icons/WhatsAppIcon'
@@ -62,6 +63,7 @@ function CartPage() {
                         <p className={styles.itemMeta}>
                           {item.material && `${item.material}`}
                           {item.color && ` · Coloris : ${item.color}`}
+                          {item.option_value && ` · ${item.option_name || 'Option'} : ${item.option_value}`}
                         </p>
                       </div>
                       <button className={styles.removeBtn} onClick={() => removeFromCart(item.key)} title="Retirer">✕</button>
@@ -92,7 +94,10 @@ function CartPage() {
               <div className="card-body">
                 {cartItems.map(item => (
                   <div key={item.key} className={styles.summaryLine}>
-                    <span>{item.name} x{item.quantity}</span>
+                    <span>
+                      {item.name} x{item.quantity}
+                      {item.option_value && ` · ${item.option_name || 'Option'} ${item.option_value}`}
+                    </span>
                     <span>{fmt(item.price * item.quantity)}</span>
                   </div>
                 ))}
@@ -121,7 +126,10 @@ function CartPage() {
                 <a
                   href={`https://wa.me/221785363425?text=${encodeURIComponent(
                     'Bonjour Porokhane Shop ✨ !\n\nJe voudrais commander :\n' +
-                    cartItems.map(i => `• ${i.name} x${i.quantity} = ${fmt(i.price * i.quantity)}`).join('\n') +
+                    cartItems.map(i => {
+                      const choices = [i.color && `Coloris : ${i.color}`, formatItemOption(i)].filter(Boolean).join(' · ')
+                      return `• ${i.name} x${i.quantity}${choices ? ` — ${choices}` : ''} = ${fmt(i.price * i.quantity)}`
+                    }).join('\n') +
                     `\n\nTotal : ${fmt(totalPrice)}\n\nMerci !`
                   )}`}
                   target="_blank" rel="noopener noreferrer"

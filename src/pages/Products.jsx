@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { supabase } from '../supabase/client'
-import { DEMO } from '../hooks/useProducts'
+import { useProducts } from '../hooks/useProducts'
 import { productMatchesUniverse, SHOP_UNIVERSES } from '../lib/catalog'
 import { SHOP_CONFIG } from '../lib/shopConfig'
 import Navbar from '../components/Navbar/Navbar'
@@ -15,9 +14,8 @@ const SORTS      = [{value:'new',label:'Nouveautés'},{value:'price-asc',label:'
 
 export default function Products() {
   const [searchParams, setSearchParams] = useSearchParams()
-  const [products, setProducts] = useState([])
   const [filtered, setFiltered] = useState([])
-  const [loading, setLoading]   = useState(true)
+  const { products, loading, error, refetch } = useProducts()
   const requestedCategory = searchParams.get('cat')
   const [activeCat, setActiveCat] = useState(SHOP_UNIVERSES.includes(requestedCategory) ? requestedCategory : 'Tous')
   const [activeMat, setActiveMat] = useState('Toutes')
@@ -26,12 +24,6 @@ export default function Products() {
   const [priceMax, setPriceMax]   = useState('')
   const [search, setSearch]       = useState('')
   const [showFilters, setShowFilters] = useState(false)
-
-  useEffect(() => {
-    supabase.from('products').select('*').eq('active', true).order('created_at', { ascending: false })
-      .then(({ data }) => { setProducts(data?.length > 0 ? data : DEMO); setLoading(false) })
-      .catch(() => { setProducts(DEMO); setLoading(false) })
-  }, [])
 
   useEffect(() => {
     setActiveCat(SHOP_UNIVERSES.includes(requestedCategory) ? requestedCategory : 'Tous')
@@ -118,12 +110,13 @@ export default function Products() {
               </button>
             </div>
           </div>
+          {error && products.length > 0 && <div className="alert alert-warning">{error} <button className={styles.retryLink} onClick={refetch}>Réessayer</button></div>}
           {loading ? <div className="spinner" style={{marginTop:60}} /> : (
             filtered.length === 0 ? (
               <div className={styles.empty}>
                 <div className={styles.emptyIcon}><SearchIcon size={30} /></div>
-                <h3>Aucun produit trouvé</h3>
-                <p>Essayez d'autres filtres ou <button className={styles.resetLink} onClick={resetFilters}>réinitialisez</button></p>
+                <h3>{error && products.length === 0 ? 'Connexion momentanément indisponible' : 'Aucun produit trouvé'}</h3>
+                <p>{error && products.length === 0 ? <button className={styles.resetLink} onClick={refetch}>Actualiser la boutique</button> : <>Essayez d'autres filtres ou <button className={styles.resetLink} onClick={resetFilters}>réinitialisez</button></>}</p>
               </div>
             ) : (
               <div className={styles.grid}>

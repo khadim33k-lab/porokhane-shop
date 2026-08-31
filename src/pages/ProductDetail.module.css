@@ -112,6 +112,7 @@
 
 .lineColors { flex: 1; }
 .lineLabel { font-size: 12px; font-weight: 600; margin-bottom: 8px; }
+.choiceGroup + .choiceGroup { margin-top: 14px; padding-top: 13px; border-top: 1px dashed var(--border); }
 .colorBtns { display: flex; gap: 6px; flex-wrap: wrap; }
 
 .colorBtn {
@@ -266,3 +267,8 @@
 @media (max-width: 480px) {
   .relatedGrid { grid-template-columns: repeat(2, minmax(0,1fr)); }
 }
+.loadError { min-height: 58vh; padding: 70px 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 13px; text-align: center; }
+.loadError img { width: 68px; height: 68px; object-fit: cover; border: 1px solid rgba(245,166,35,.42); border-radius: 50%; }
+.loadError h1 { font-family: var(--font-serif); font-size: clamp(27px,4vw,42px); font-weight: 500; }
+.loadError p { color: var(--gray-mid); font-size: 13px; }
+.loadError > a { color: var(--gray-mid); font-size: 11px; font-weight: 700; text-decoration: underline; }

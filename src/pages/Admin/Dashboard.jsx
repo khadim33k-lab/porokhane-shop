@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../../supabase/client'
+import { withTimeout } from '../../lib/async'
 import { AlertIcon, OrdersIcon, RevenueIcon, StockIcon } from '../../components/icons/AdminIcons'
 import styles from './Dashboard.module.css'
 
@@ -13,10 +14,10 @@ export default function Dashboard() {
 
   const loadData = async () => {
     try {
-      const [{ data: orders }, { data: products }] = await Promise.all([
+      const [{ data: orders }, { data: products }] = await withTimeout(Promise.all([
         supabase.from('orders').select('*').order('created_at', { ascending: false }).limit(20),
         supabase.from('products').select('*')
-      ])
+      ]))
 
       const o = orders || []
       const p = products || []
@@ -54,8 +55,8 @@ export default function Dashboard() {
   return (
     <div className={styles.page}>
       <div className={styles.pageHeader}>
-        <h1 className={styles.pageTitle}>Tableau de bord</h1>
-        <span style={{fontSize:12,color:'var(--gray-mid)'}}>
+        <div><p className={styles.pageEyebrow}>Activité de la boutique</p><h1 className={styles.pageTitle}>Tableau de bord</h1><p className={styles.pageDescription}>Les informations essentielles pour piloter Porokhane Shop.</p></div>
+        <span className={styles.datePill}>
           {new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}
         </span>
       </div>
@@ -105,7 +106,7 @@ export default function Dashboard() {
           <span className="card-title">Commandes récentes</span>
           <Link to="/admin/commandes" style={{fontSize:12,color:'var(--orange)',fontWeight:500}}>Voir tout →</Link>
         </div>
-        <div className="table-wrapper">
+        <div className={`table-wrapper ${styles.recentTable}`}>
           <table>
             <thead><tr><th>Client</th><th>Produits</th><th>Montant</th><th>Paiement</th><th>Statut</th><th>Date</th></tr></thead>
             <tbody>
@@ -128,6 +129,9 @@ export default function Dashboard() {
               ))}
             </tbody>
           </table>
+        </div>
+        <div className={styles.recentCards}>
+          {recent.length === 0 ? <div className={styles.emptyRecent}>Aucune commande pour l'instant</div> : recent.map(o => <article className={styles.recentCard} key={o.id}><div className={styles.recentCardTop}><div><strong>{o.client_name}</strong><span>{o.client_phone || 'Téléphone non renseigné'}</span></div><span className={`badge ${STATUS[o.status]||'badge-progress'}`}>{o.status}</span></div><p>{(o.items||[]).map(i=>i.name).join(', ')||'Commande sans détail'}</p><div className={styles.recentCardBottom}><strong>{fmt(o.total)}</strong><span>{fmtDate(o.created_at)}</span></div></article>)}
         </div>
       </div>
     </div>

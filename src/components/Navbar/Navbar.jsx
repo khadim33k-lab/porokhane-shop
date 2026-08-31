@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { useCart } from '../../context/CartContext'
 import { SHOP_CONFIG, whatsappLink } from '../../lib/shopConfig'
 import WhatsAppIcon from '../icons/WhatsAppIcon'
+import { TikTokIcon, XIcon } from '../icons/SocialIcons'
 import { BagIcon as StoreBagIcon, GridIcon, HomeIcon } from '../icons/StoreIcons'
 import CartDrawer from '../Cart/CartDrawer'
 import styles from './Navbar.module.css'
@@ -46,11 +47,19 @@ export default function Navbar() {
   return (
     <>
       <div className={styles.announcement}>
-        <span>Livraison à Dakar et environs</span>
+        <span>{SHOP_CONFIG.delivery}</span>
         <span>{SHOP_CONFIG.slogan}</span>
-        <a href={whatsappLink()} target="_blank" rel="noopener noreferrer">
-          <WhatsAppIcon size={15} /> {SHOP_CONFIG.phone}
-        </a>
+        <div className={styles.announcementActions}>
+          <a href={SHOP_CONFIG.xUrl} target="_blank" rel="noopener noreferrer" aria-label="Suivre Porokhane Shop sur X">
+            <XIcon size={13} />
+          </a>
+          <a href={SHOP_CONFIG.tiktokUrl} target="_blank" rel="noopener noreferrer" aria-label="Suivre Porokhane Shop sur TikTok">
+            <TikTokIcon size={15} />
+          </a>
+          <a href={whatsappLink()} target="_blank" rel="noopener noreferrer" aria-label={`Contacter Porokhane Shop au ${SHOP_CONFIG.phone}`}>
+            <WhatsAppIcon size={15} /> <span>{SHOP_CONFIG.phone}</span>
+          </a>
+        </div>
       </div>
 
       <header className={`${styles.navbar} ${scrolled ? styles.scrolled : ''}`}>
@@ -97,6 +106,10 @@ export default function Navbar() {
         <Link to="/produits">Nouveautés</Link>
         <Link to="/produits?cat=Mode%20%26%20Voiles">Mode & Voiles</Link>
         <Link to="/produits?cat=Accessoires">Accessoires</Link>
+        <div className={styles.mobileSocials} aria-label="Réseaux sociaux">
+          <a href={SHOP_CONFIG.xUrl} target="_blank" rel="noopener noreferrer" aria-label="Suivre Porokhane Shop sur X"><XIcon size={18} /> X</a>
+          <a href={SHOP_CONFIG.tiktokUrl} target="_blank" rel="noopener noreferrer" aria-label="Suivre Porokhane Shop sur TikTok"><TikTokIcon size={20} /> TikTok</a>
+        </div>
         <a href={whatsappLink()} target="_blank" rel="noopener noreferrer" className={styles.mobileWhatsapp}>
           <WhatsAppIcon size={21} /> WhatsApp
         </a>

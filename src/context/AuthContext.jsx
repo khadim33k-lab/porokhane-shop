@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react'
 import { supabase } from '../supabase/client'
+import { withTimeout } from '../lib/async'
 
 const AuthContext = createContext()
 
@@ -10,53 +11,81 @@ export function AuthProvider({ children }) {
 
   // Vérifier si l'utilisateur est dans la table admins
   const checkAdmin = async (userId) => {
-    if (!userId) { setIsAdmin(false); return }
+    if (!userId) { setIsAdmin(false); return false }
+    let timeout
     try {
+      const controller = new AbortController()
+      timeout = window.setTimeout(() => controller.abort(), 6500)
       const { data, error } = await supabase
         .from('admins')
         .select('id')
         .eq('user_id', userId)
         .single()
-      setIsAdmin(!error && !!data)
+        .abortSignal(controller.signal)
+      const allowed = !error && !!data
+      setIsAdmin(allowed)
+      return allowed
     } catch {
       setIsAdmin(false)
+      return false
+    } finally {
+      window.clearTimeout(timeout)
     }
   }
 
   useEffect(() => {
-    // Vérifier la session au démarrage
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      setUser(session?.user ?? null)
-      await checkAdmin(session?.user?.id)
-      setLoading(false)
-    }).catch(() => setLoading(false))
+    let mounted = true
+    const restoreSession = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
+        if (!mounted) return
+        setUser(session?.user ?? null)
+        if (session?.user?.id) await checkAdmin(session.user.id)
+        else setIsAdmin(false)
+      } catch {
+        if (mounted) { setUser(null); setIsAdmin(false) }
+      } finally {
+        if (mounted) setLoading(false)
+      }
+    }
+    restoreSession()
 
     // Écouter les changements de session
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
+      (_event, session) => {
+        if (!mounted) return
         setUser(session?.user ?? null)
-        await checkAdmin(session?.user?.id)
+        setLoading(false)
+        if (!session?.user?.id) {
+          setIsAdmin(false)
+          return
+        }
+
+        // Ne jamais attendre une requête Supabase dans onAuthStateChange :
+        // cela peut bloquer signInWithPassword. La vérification est différée.
+        window.setTimeout(() => {
+          if (mounted) checkAdmin(session.user.id)
+        }, 0)
       }
     )
-    return () => subscription.unsubscribe()
+    return () => { mounted = false; subscription.unsubscribe() }
   }, [])
 
   const login = async (email, password) => {
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+    const { data, error } = await withTimeout(
+      supabase.auth.signInWithPassword({ email: email.trim(), password }),
+      12000
+    )
     if (error) throw error
 
-    // Vérifier que c'est bien un admin
-    const { data: adminData } = await supabase
-      .from('admins')
-      .select('id')
-      .eq('user_id', data.user.id)
-      .single()
+    const adminAllowed = await checkAdmin(data.user.id)
 
-    if (!adminData) {
+    if (!adminAllowed) {
       await supabase.auth.signOut()
       throw new Error('Accès refusé. Compte non autorisé.')
     }
 
+    setUser(data.user)
     setIsAdmin(true)
     return data
   }
@@ -69,7 +98,7 @@ export function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider value={{ user, isAdmin, loading, login, logout }}>
-      {!loading && children}
+      {children}
     </AuthContext.Provider>
   )
 }

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { supabase } from '../../supabase/client'
 import WhatsAppIcon from '../../components/icons/WhatsAppIcon'
 import { OrdersIcon, RefreshIcon } from '../../components/icons/AdminIcons'
+import { withTimeout } from '../../lib/async'
 import styles from './AdminOrders.module.css'
 
 const STATUSES = ['Tous', 'Nouveau', 'En cours', 'Livré', 'Annulé']
@@ -31,10 +32,10 @@ export default function AdminOrders() {
     setLoading(true)
     setError(null)
     try {
-      const { data, error: err } = await supabase
+      const { data, error: err } = await withTimeout(supabase
         .from('orders')
         .select('*')
-        .order('created_at', { ascending: false })
+        .order('created_at', { ascending: false }))
 
       if (err) throw err
       setOrders(data || [])
@@ -78,6 +79,11 @@ export default function AdminOrders() {
   }
 
   const fmt     = n => Number(n || 0).toLocaleString('fr-SN') + ' FCFA'
+  const itemChoices = item => [
+    item.color && `Coloris : ${item.color}`,
+    item.option_value && `${item.option_name || 'Option'} : ${item.option_value}`
+  ].filter(Boolean).join(' · ')
+  const itemSummary = item => `${item.name}${itemChoices(item) ? ` (${itemChoices(item)})` : ''} x${item.quantity}`
   const fmtDate = ts => {
     if (!ts) return '—'
     return new Date(ts).toLocaleDateString('fr-FR', {
@@ -137,7 +143,7 @@ export default function AdminOrders() {
 
       {/* TABLE */}
       <div className="card">
-        <div className="table-wrapper">
+        <div className={`table-wrapper ${styles.desktopTable}`}>
           {loading ? (
             <div className="spinner" style={{ margin: '40px auto' }} />
           ) : filtered.length === 0 ? (
@@ -177,7 +183,7 @@ export default function AdminOrders() {
                     </td>
                     <td style={{ fontSize: 12, color: 'var(--gray-mid)' }}>{o.client_zone}</td>
                     <td style={{ fontSize: 12, maxWidth: 180 }}>
-                      {(o.items || []).map(i => `${i.name} x${i.quantity}`).join(', ').substring(0, 50)}
+                      {(o.items || []).map(itemSummary).join(', ').substring(0, 90)}
                       {o.note && <div style={{ fontSize: 11, color: 'var(--orange)', marginTop: 2 }}>Note : {o.note}</div>}
                     </td>
                     <td style={{ fontWeight: 700, color: 'var(--orange)', whiteSpace: 'nowrap' }}>
@@ -223,6 +229,14 @@ export default function AdminOrders() {
             </table>
           )}
         </div>
+        {!loading && <div className={styles.mobileOrders}>
+          {filtered.length === 0 ? <div className={styles.mobileEmpty}>Aucune commande trouvée.</div> : filtered.map(o => <article className={styles.orderCard} key={o.id}>
+            <div className={styles.orderCardHead}><div><span>#{(o.id||'').slice(-6).toUpperCase()}</span><h2>{o.client_name}</h2><a href={`tel:${o.client_phone||''}`}>{o.client_phone||'Sans téléphone'}</a></div><strong>{fmt(o.total)}</strong></div>
+            <div className={styles.orderCardBody}><p>{(o.items||[]).map(itemSummary).join(', ')||'—'}</p><small>{o.client_zone||'Zone non renseignée'} · {fmtDate(o.created_at)}</small></div>
+            <div className={styles.orderCardStatus}><label>Statut</label><select className={styles.statusSelect} value={o.status||'Nouveau'} onChange={e=>updateStatus(o.id,e.target.value)}>{['Nouveau','En cours','Livré','Annulé'].map(s=><option key={s}>{s}</option>)}</select></div>
+            <div className={styles.orderCardActions}><button className="btn btn-sm btn-outline" onClick={()=>setSelected(o)}>Voir les détails</button><a href={`https://wa.me/221${(o.client_phone||'').replace(/\s/g,'')}?text=${waMsg(o)}`} target="_blank" rel="noopener noreferrer"><WhatsAppIcon size={17}/> WhatsApp</a><button onClick={()=>deleteOrder(o.id)}>✕</button></div>
+          </article>)}
+        </div>}
       </div>
 
       {/* MODAL DÉTAILS */}
@@ -245,7 +259,10 @@ export default function AdminOrders() {
                 <h3>Produits commandés</h3>
                 {(selected.items || []).map((item, i) => (
                   <div key={i} className={styles.orderItem}>
-                    <span>{item.name}</span>
+                    <span>
+                      {item.name}
+                      {itemChoices(item) && <small className={styles.orderItemMeta}>{itemChoices(item)}</small>}
+                    </span>
                     <span>x{item.quantity}</span>
                     <span style={{ fontWeight: 600, color: 'var(--orange)' }}>
                       {fmt((item.price || 0) * (item.quantity || 1))}
@@ -271,7 +288,7 @@ export default function AdminOrders() {
               <a
                 href={`https://wa.me/221${(selected.client_phone || '').replace(/\s/g, '')}?text=${encodeURIComponent(
                   `Bonjour ${selected.client_name} ! ✨\n\nVotre commande Porokhane Shop est confirmée !\n\n` +
-                  (selected.items || []).map(i => `• ${i.name} x${i.quantity}`).join('\n') +
+                  (selected.items || []).map(i => `• ${itemSummary(i)}`).join('\n') +
                   `\n\nTotal : ${fmt(selected.total)}\nMode : ${selected.payment_method}\n\nNous vous livrons bientôt ! 🚚`
                 )}`}
                 target="_blank"

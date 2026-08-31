@@ -1,6 +1,6 @@
-.page { padding: 32px 36px 54px; }
+.page { max-width:1500px; margin:0 auto; padding:30px clamp(22px,3vw,44px) 56px; }
 .pageHeader { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 14px; }
-.pageTitle { font-family: var(--font-serif); font-size: 34px; font-weight: 500; line-height: 1.1; }
+.pageTitle { font-family:var(--font-serif); font-size:clamp(28px,2.5vw,35px); font-weight:600; line-height:1.1; }
 
 .periodBtns { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
 .periodBtns::-webkit-scrollbar { display: none; }
@@ -15,7 +15,7 @@
 
 /* KPI */
 .kpiGrid { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 20px; }
-.kpi { background: #fffdf9; border: 1px solid var(--border); padding: 20px 18px; position: relative; overflow: hidden; box-shadow: 0 12px 35px rgba(26,20,14,.03); }
+.kpi { background:#fffdf9; border:1px solid var(--border); border-radius:12px; padding:20px 18px; position:relative; overflow:hidden; box-shadow:0 12px 35px rgba(26,20,14,.03); }
 .kpiOr { border-top: 3px solid var(--orange); }
 .kpiLabel { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gray-mid); margin-bottom: 8px; }
 .kpiValue { font-family: var(--font-serif); font-size: 24px; font-weight: 700; margin-bottom: 4px; }
@@ -54,7 +54,7 @@
 .payBar { flex: 2; height: 4px; background: var(--border); border-radius: 2px; }
 .payBar div { height: 100%; background: var(--orange); border-radius: 2px; }
 .payCount { font-size: 11px; font-weight: 700; background: var(--gray-light); color: var(--gray-mid); padding: 2px 8px; border-radius: 10px; white-space: nowrap; }
-.page :global(.card) { border-radius: 0; box-shadow: 0 12px 35px rgba(26,20,14,.03); }
+.page :global(.card) { border-radius:14px; }.mobileTopProducts{display:none}
 .page :global(.card-title) { font-family: var(--font-serif); font-size: 16px; font-weight: 600; }
 
 @media (max-width: 900px) {
@@ -72,7 +72,8 @@
   .kpiLabel { min-height: 26px; font-size: 8px; }
   .kpiValue { font-size: 20px; overflow-wrap: anywhere; }
   .barChart { gap: 5px; padding-left: 10px; padding-right: 10px; }
+  .desktopTable{display:none}.mobileTopProducts{display:grid;padding:6px 13px 11px}.mobileTopProducts>p{padding:22px;text-align:center;color:var(--gray-mid);font-size:10px}.mobileTopRow{display:grid;grid-template-columns:25px minmax(0,1fr) auto;align-items:center;gap:9px;padding:11px 0;border-bottom:1px solid #eee8e1}.mobileTopRow>span{color:var(--orange-dark);font-family:var(--font-serif);font-size:12px;font-weight:700}.mobileTopRow div{min-width:0;display:flex;flex-direction:column}.mobileTopRow strong{overflow:hidden;font-size:10px;text-overflow:ellipsis;white-space:nowrap}.mobileTopRow small{color:#898178;font-size:8px}.mobileTopRow b{color:var(--orange-dark);font-family:var(--font-serif);font-size:10px}
 }
-@media (max-width: 390px) {
+@media (max-width: 340px) {
   .kpiGrid { grid-template-columns: 1fr; }
 }

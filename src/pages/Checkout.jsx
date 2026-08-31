@@ -61,6 +61,8 @@ export default function Checkout() {
           price:      i.price,
           quantity:   i.quantity,
           color:      i.color || '',
+          option_name: i.option_name || '',
+          option_value: i.option_value || '',
           emoji:      i.emoji || '🧕'
         })),
         p_total:          totalPrice,
@@ -257,7 +259,11 @@ export default function Checkout() {
                       </div>
                       <div className={styles.summaryInfo}>
                         <p className={styles.summaryName}>{i.name}</p>
-                        <p className={styles.summaryMeta}>{i.color && `${i.color} · `}Qté: {i.quantity}</p>
+                        <p className={styles.summaryMeta}>
+                          {i.color && `Coloris : ${i.color} · `}
+                          {i.option_value && `${i.option_name || 'Option'} : ${i.option_value} · `}
+                          Qté: {i.quantity}
+                        </p>
                       </div>
                       <p className={styles.summaryPrice}>{fmt(i.price * i.quantity)}</p>
                     </div>

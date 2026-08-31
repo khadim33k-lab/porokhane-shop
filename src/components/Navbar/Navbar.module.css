@@ -12,9 +12,11 @@
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }
-.announcement span:nth-child(2) { color: #fff; text-align: center; }
-.announcement a { justify-self: end; display: inline-flex; align-items: center; gap: 7px; color: #fff; }
-.announcement a svg { color: #25d366; }
+.announcement > span:nth-child(2) { color: #fff; text-align: center; }
+.announcementActions { justify-self: end; display: flex; align-items: center; gap: 13px; }
+.announcementActions a { display: inline-flex; align-items: center; gap: 7px; color: #fff; transition: color .2s, opacity .2s; }
+.announcementActions a:hover { color: var(--orange); }
+.announcementActions a:last-child svg { color: #25d366; }
 
 .navbar {
   min-height: 82px;
@@ -48,14 +50,14 @@
 .whatsappButton:hover { background: #eaf8ef; border-color: #c8ebd4; color: #12843f; }
 .cartBadge { position: absolute; top: 2px; right: 0; min-width: 18px; height: 18px; padding: 0 4px; display: grid; place-items: center; border-radius: 999px; background: var(--orange); color: #111; font-size: 9px; font-weight: 700; }
 .menuButton { display: none; }
-.mobileMenu, .overlay { display: none; }
+.mobileMenu, .overlay, .mobileSocials { display: none; }
 
 .floatingWhatsapp { position: fixed; right: 24px; bottom: 24px; z-index: 120; min-height: 50px; padding: 0 17px; display: inline-flex; align-items: center; gap: 9px; border-radius: 999px; background: #25d366; color: #fff; box-shadow: 0 12px 34px rgba(13, 120, 57, 0.3); font-size: 12px; font-weight: 600; transition: transform 0.2s, background 0.2s; }
 .floatingWhatsapp:hover { transform: translateY(-2px); background: #20bd5b; }
 
 @media (max-width: 980px) {
   .announcement { grid-template-columns: 1fr 1fr; }
-  .announcement span:nth-child(2) { display: none; }
+  .announcement > span:nth-child(2) { display: none; }
   .desktopNav { display: none; }
   .navbar { grid-template-columns: 1fr auto; min-height: 72px; }
   .logo { justify-self: start; }
@@ -66,14 +68,18 @@
   .mobileMenuHead { display: flex; justify-content: space-between; margin-bottom: 28px; padding-bottom: 18px; border-bottom: 1px solid var(--border); text-transform: uppercase; font-size: 11px; letter-spacing: 0.14em; }
   .mobileMenuHead button { border: 0; background: transparent; color: var(--gray-mid); font-size: 11px; }
   .mobileMenu > a { padding: 15px 0; border-bottom: 1px solid var(--border); font-family: var(--font-display); font-size: 26px; }
+  .mobileSocials { margin-top: 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+  .mobileSocials a { min-height: 44px; padding: 10px 14px; display: inline-flex; align-items: center; justify-content: center; gap: 9px; border: 1px solid var(--border); border-radius: 999px; color: #1b1917; font-family: var(--font-sans); font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; }
   .mobileMenu .mobileWhatsapp { margin-top: 20px; padding: 13px 18px; display: inline-flex; align-items: center; justify-content: center; gap: 9px; border: 0; border-radius: 999px; background: #25d366; color: #fff; font-family: var(--font-sans); font-size: 13px; }
   .overlay { display: block; position: fixed; inset: 0; z-index: 170; border: 0; background: rgba(15, 13, 12, 0.48); }
 }
 
 @media (max-width: 768px) {
   .announcement { min-height: 34px; padding: 7px 14px; font-size: 8px; gap: 10px; }
-  .announcement span:first-child { white-space: nowrap; }
-  .announcement a { letter-spacing: 0.06em; }
+  .announcement > span:first-child { white-space: nowrap; }
+  .announcementActions { gap: 11px; }
+  .announcementActions a { letter-spacing: 0.06em; }
+  .announcementActions a:last-child span { display: none; }
   .navbar { padding: 8px 14px; }
   .logo img { width: 44px; height: 44px; }
   .logo span { font-size: 20px; }
@@ -85,12 +91,12 @@
 }
 
 @media (max-width: 390px) {
-  .announcement span:first-child { overflow: hidden; text-overflow: ellipsis; }
+  .announcement > span:first-child { overflow: hidden; text-overflow: ellipsis; }
   .logo span { display: none; }
 }
 
 @media (max-width: 350px) {
   .announcement { grid-template-columns: 1fr; text-align: center; }
-  .announcement span:first-child { display: none; }
-  .announcement a { justify-self: center; }
+  .announcement > span:first-child { display: none; }
+  .announcementActions { justify-self: center; }
 }
